@@ -1,7 +1,7 @@
 <template>
   <div>
     <form novalidate class="md-layout" @submit.prevent="validateUser">
-      <md-card class="md-layout-item md-size-50 md-small-size-100">
+      <md-card>
         <md-card-header>
           <div class="md-title">Dados do Reembolso</div>
         </md-card-header>
@@ -13,22 +13,20 @@
           <div class="md-layout md-gutter">
             <div class="md-layout-item md-small-size-100">
               <md-field :class="getValidationClass('name')">
-                <label for="name">First Name</label>
+                <label for="name">Nome do reembolso</label>
                 <md-input name="name" id="name" autocomplete="given-name" v-model="form.name" :disabled="sending" />
                 <span class="md-error" v-if="!$v.form.firstName.required">The first name is required</span>
                 <span class="md-error" v-else-if="!$v.form.firstName.minlength">Invalid first name</span>
               </md-field>
             </div>
 
-
           </div>
-
           <div class="md-layout md-gutter">
-            <div class="md-layout-item md-small-size-100">
+            <div class="md-layout-item">
               <md-field :class="getValidationClass('gender')">
                 <label for="type">Categoria</label>
                 <md-select name="type" id="type" v-model="form.type" md-dense :disabled="sending">
-                  <md-option></md-option>
+                  <md-option value="">Escolha</md-option>
                   <md-option value="0">Outros</md-option>
                   <md-option value="1">Hospedagem</md-option>
                   <md-option value="2">Transposte</md-option>
@@ -36,20 +34,19 @@
                 </md-select>
                 <span class="md-error">The gender is required</span>
               </md-field>
-            
+              <div class="md-layout-item md-small-size-100">
                 <md-datepicker v-model="selectedDate" md-immediately />
-
-            </div>
-
-            <div class="md-layout-item md-small-size-100">
-              <md-field :class="getValidationClass('value')">
-                <label for="value">Valor</label>
-                <md-input type="number" id="value" name="value" autocomplete="value" v-model="form.value" :disabled="sending" />
-                <span class="md-error" v-if="!$v.form.age.required">The age is required</span>
-                <span class="md-error" v-else-if="!$v.form.age.maxlength">Invalid age</span>
-              </md-field>
+              </div>
             </div>
           </div>
+          <div class="md-layout-item md-small-size-100">
+            <md-field :class="getValidationClass('value')">
+              <label for="value">Valor</label>
+              <md-input type="number" id="value" name="value" autocomplete="value" v-model="form.value" :disabled="sending" />
+              <span class="md-error" v-if="!$v.form.age.required">The age is required</span>
+              <span class="md-error" v-else-if="!$v.form.age.maxlength">Invalid age</span>
+            </md-field>
+          </div>  
           <md-field>
             <label>Anexo</label>
             <md-file v-model="single" />
@@ -79,6 +76,7 @@
   } from 'vuelidate/lib/validators'
 
   export default {
+    props: ['cadastro-reembolsos'],
     name: 'DadosReembolso',
     mixins: [validationMixin],
     data: () => ({
@@ -163,5 +161,15 @@
     top: 0;
     right: 0;
     left: 0;
+  }
+
+  .md-title{
+    padding-left: 30px;
+  }
+
+  .md-card-content {
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-top: 15px;
   }
 </style>

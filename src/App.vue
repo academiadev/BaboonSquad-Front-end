@@ -29,4 +29,5 @@ import Navbar from './components/Shared/Navbar.vue';
   .md-content {
     padding: 16px;
   }
+
 </style>

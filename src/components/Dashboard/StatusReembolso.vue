@@ -1,18 +1,20 @@
 <template>
-  <md-table-cell v-if="status===0">
-    <md-icon class="green-icon">check_circle</md-icon>
-  </md-table-cell>
-  <md-table-cell v-else-if="status===1">
-    <md-icon class="red-icon" >highlight_off</md-icon>
-  </md-table-cell>
-  <md-table-cell v-else>
-    <md-icon class="yellow-icon">schedule</md-icon>
-  </md-table-cell>
+  <div class="status-icon">
+    <div v-if="status===0" >
+      <md-icon class="green-icon">check_circle</md-icon>
+    </div>
+    <div v-else-if="status===1">
+      <md-icon class="red-icon" >highlight_off</md-icon>
+    </div>
+    <div v-else >
+      <md-icon class="yellow-icon">schedule</md-icon>
+    </div>
+  </div>
 </template>
 
 <script>
 export default {
-  props: ['status']
+  props: ['status'],
 }
 </script >
 
@@ -27,5 +29,10 @@ export default {
 
  .yellow-icon {
    color: #fecf33;
+ }
+
+ .status-icon{
+   padding: 0;
+   margin: 0;
  }
 </style>
