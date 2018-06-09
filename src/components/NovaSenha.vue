@@ -1,7 +1,7 @@
 <template>
   <div>
     <md-empty-state></md-empty-state>
-    <form novalidate class="md-layout md-alignment-top-center " @submit.prevent="validateUser">
+    <form novalidate class="md-layout md-alignment-top-center " @submit.prevent="validatePasswords">
       <md-card class="md-layout-item md-size-30 md-small-size-100">
         <md-card-header class="md-layout md-alignment-center">
           <div class="md-title">Cadastre uma nova senha</div>
@@ -10,19 +10,15 @@
         <md-card-content>
 
           <div class="md-layout-item md-small-size-100">
-            <md-field :class="getValidationClass('password')">
-              <label for="password">Password</label>
-              <md-input name="password" id="password" v-model="form.password" :disabled="sending" />
-              <span class="md-error" v-if="!$v.form.password.required">The password is required</span>
-              <span class="md-error" v-else-if="!$v.form.password.minlength">Invalid password</span>
-            </md-field>
+              <adevpassword v-model="form.password" v-on:isValid="validatePassword"></adevpassword>
           </div>
           <div class="md-layout-item md-small-size-100">
-            <md-field :class="getValidationClass('password')">
-              <label for="password">Password</label>
-              <md-input name="password" id="password" v-model="form.password" :disabled="sending" />
-              <span class="md-error" v-if="!$v.form.password.required">The password is required</span>
-              <span class="md-error" v-else-if="!$v.form.password.minlength">Invalid password</span>
+            <md-field :class="getValidationClass('confirmPassword')">
+              <label for="password">Confirmar senha</label>
+              <md-input type="password" name="confirmPassword" id="confirmPassword" v-model="form.confirmPassword"
+                        @blur="$v.form.confirmPassword.$touch()" :disabled="sending" />
+              <span class="md-error" v-if="!$v.form.confirmPassword.required">É necesário confirmar a sua senha</span>
+              <span class="md-error" v-else-if="!$v.form.confirmPassword.sameAs">As senha devem ser iguais</span>
             </md-field>
           </div>
         </md-card-content>
@@ -35,18 +31,19 @@
 
       </md-card>
 
-      <md-snackbar :md-active.sync="userSaved">The user {{ lastUser }} was saved with success!</md-snackbar>
+      <md-snackbar :md-active.sync="userSaved">Senha alterada com sucesso!</md-snackbar>
     </form>
+    <p>{{$v}}</p>
   </div>
 </template>
 
 <script>
+  import Password from './Shared/Password.vue'
   import { validationMixin } from 'vuelidate'
   import {
     required,
-    email,
     minLength,
-    maxLength
+    sameAs
   } from 'vuelidate/lib/validators'
 
   export default {
@@ -54,8 +51,8 @@
     mixins: [validationMixin],
     data: () => ({
       form: {
-        email: null,
         password: null,
+        confirmPassword: null
       },
       userSaved: false,
       sending: false,
@@ -63,13 +60,12 @@
     }),
     validations: {
       form: {
-        email: {
-          required,
-          email
-        },
         password: {
+
+        },
+        confirmPassword: {
           required,
-          minLength: minLength(3)
+          sameAs: sameAs('password')
         }
       }
     },
@@ -83,28 +79,19 @@
           }
         }
       },
-      clearForm () {
-        this.$v.$reset()
-        this.form.password = null
-        this.form.email = null
+      validatePassword (value) {
+        this.$v.password.$invalid = value
       },
-      saveUser () {
-        this.sending = true
-
-        // Instead of this timeout, here you can call your API
-        window.setTimeout(() => {
-          this.userSaved = true
-          this.sending = false
-          this.clearForm()
-        }, 1500)
-      },
-      validateUser () {
+      validatePasswords () {
         this.$v.$touch()
 
         if (!this.$v.$invalid) {
           this.saveUser()
         }
-      }
+      },
+    },
+    components: {
+      adevpassword: Password
     }
   }
 </script>
