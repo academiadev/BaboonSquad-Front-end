@@ -22,7 +22,7 @@
           <md-icon>perm_identity</md-icon>Perfil
       </md-list-item>
 
-      <md-list-item to='/'>
+      <md-list-item @click:"onLogout">
           <md-icon>input</md-icon>Sair
       </md-list-item>
     </md-list>
@@ -35,7 +35,17 @@
     name: 'Navbar',
     data: () => ({
       showNavigation: false
-    })
+    }),
+    computed: {
+      auth () {
+        return this.$store.getters.isAuthenticated
+      }
+    },
+    methods: {
+      onLogout() {
+        this.$store.dispatch('logout')
+      }
+    }
   }
 </script>
 

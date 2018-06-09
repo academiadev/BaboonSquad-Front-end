@@ -15,6 +15,9 @@ import Navbar from './components/Shared/Navbar.vue';
     }),
     components: {
       appnavbar: Navbar
+    },
+    created () {
+      this.$store.dispatch('tryAutoLogin')
     }
   }
 </script>

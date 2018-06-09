@@ -7,9 +7,9 @@
         <md-card-content>
           <md-field :class="getValidationClass('firstName')">
               <label for="first-name">First Name</label>
-              <md-input name="first-name" id="first-name" autocomplete="given-name" v-model="form.firstName" :disabled="sending" />
-              <span class="md-error" v-if="!$v.form.firstName.required">The first name is required</span>
-              <span class="md-error" v-else-if="!$v.form.firstName.minlength">Invalid first name</span>
+              <md-input name="name" id="name" autocomplete="name" v-model="form.name" :disabled="sending" />
+              <span class="md-error" v-if="!$v.form.name.required">The first name is required</span>
+              <span class="md-error" v-else-if="!$v.form.name.minlength">Invalid first name</span>
           </md-field>
 
           <md-field :class="getValidationClass('email')">
@@ -23,11 +23,11 @@
         <md-progress-bar md-mode="indeterminate" v-if="sending" />
 
         <md-card-actions class="md-alignment-left">
-          <md-button type="submit" class="md-dense md-raised md-primary" :disabled="sending">Redefinir senha</md-button>
+          <md-button to="./redefinirsenha" class="md-dense md-raised md-primary" :disabled="sending">Redefinir senha</md-button>
         </md-card-actions>
 
         <md-card-actions>
-          <md-button>Atualizar</md-button>
+          <md-button type="submit">Atualizar</md-button>
         </md-card-actions >
 
       </md-card>
@@ -51,10 +51,7 @@
     mixins: [validationMixin],
     data: () => ({
       form: {
-        firstName: null,
-        lastName: null,
-        gender: null,
-        age: null,
+        name: null,
         email: null,
       },
       userSaved: false,
@@ -63,20 +60,9 @@
     }),
     validations: {
       form: {
-        firstName: {
+        name: {
           required,
           minLength: minLength(3)
-        },
-        lastName: {
-          required,
-          minLength: minLength(3)
-        },
-        age: {
-          required,
-          maxLength: maxLength(3)
-        },
-        gender: {
-          required
         },
         email: {
           required,

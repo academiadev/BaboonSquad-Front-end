@@ -1,14 +1,16 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '@/components/Home.vue'
-import Login from '@/components/Login.vue'
-import Cadastro from '@/components/Cadastro.vue'
-import Perfil from '@/components/Perfil.vue'
+import Welcome from '@/components/Welcome.vue'
+import Login from '@/components/Auth/Login.vue'
+import Cadastro from '@/components/Auth/Cadastro.vue'
+import Perfil from '@/components/User/Perfil.vue'
 import Gastos from '@/components/Dashboard/Gastos.vue'
 import Reembolsos from '@/components/Dashboard/Reembolsos.vue'
 import DadosReembolso from '@/components/Dashboard/DadosReembolso.vue'
 import RedefinirSenha from '@/components/RedefinirSenha.vue'
 import NovaSenha from '@/components/NovaSenha.vue'
+
+import store from '../store'
 
 Vue.use(Router)
 
@@ -21,8 +23,8 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'Home',
-      component: Home
+      name: 'Welcome',
+      component: Welcome
     },
     {
       path: '/login',
@@ -42,7 +44,14 @@ export default new Router({
     {
       path: '/gastos',
       name: 'Gastos',
-      component: Gastos
+      component: Gastos,
+      beforeEnter (to, from, next) {
+      if (store.state.idToken) {
+        next()
+      } else {
+        next('/login')
+      }
+    }
     },
     {
       path: '/reembolsos',

@@ -93,12 +93,15 @@
       saveUser () {
         this.sending = true
 
-        // Instead of this timeout, here you can call your API
-        window.setTimeout(() => {
+        this.$store.dispatch('singin', {email: this.form.email, password: this.form.password})  
           this.userSaved = true
           this.sending = false
-          this.clearForm()
-        }, 1500)
+
+      },
+      OnSubimit () {
+        const formData = {
+
+        }
       },
       validateUser () {
         this.$v.$touch()
