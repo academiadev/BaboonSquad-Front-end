@@ -1,7 +1,7 @@
 <template>
   <div>
     <md-empty-state></md-empty-state>
-    <form novalidate class="md-layout md-alignment-top-center " @submit.prevent="validateUser">
+    <form novalidate class="md-layout md-alignment-top-center" @submit.prevent="validateUser">
       <md-card class="md-layout-item md-size-35 md-small-size-100">
         <md-card-header class="md-layout md-alignment-center">
           <div class="md-title">Reembolso ContaAzul</div>
@@ -93,7 +93,7 @@
       saveUser () {
         this.sending = true
 
-        this.$store.dispatch('singin', {email: this.form.email, password: this.form.password})  
+        this.$store.dispatch('login', {email: this.form.email, password: this.form.password})  
           this.userSaved = true
           this.sending = false
 

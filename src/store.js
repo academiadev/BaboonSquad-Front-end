@@ -55,7 +55,7 @@ export default new Vuex.Store({
         .catch(error => console.log(error))
     },
     login ({commit, dispatch}, authData) {
-      axios.post('/verifyPassword?key=AIzaSyC88D7GaIUv3CCn602xSjB6ZB4XNmh-AZk', {
+      axios.post('auth/login', {
         email: authData.email,
         password: authData.password,
         returnSecureToken: true

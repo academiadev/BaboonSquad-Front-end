@@ -22,7 +22,7 @@
           <md-icon>perm_identity</md-icon>Perfil
       </md-list-item>
 
-      <md-list-item @click:"onLogout">
+      <md-list-item @click="onLogout">
           <md-icon>input</md-icon>Sair
       </md-list-item>
     </md-list>

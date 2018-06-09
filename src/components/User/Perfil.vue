@@ -6,17 +6,17 @@
 
         <md-card-content>
           <md-field :class="getValidationClass('firstName')">
-              <label for="first-name">First Name</label>
+              <label for="first-name">Nome</label>
               <md-input name="name" id="name" autocomplete="name" v-model="form.name" :disabled="sending" />
-              <span class="md-error" v-if="!$v.form.name.required">The first name is required</span>
+              <span class="md-error" v-if="!$v.form.name.required">É necessário informar o nome</span>
               <span class="md-error" v-else-if="!$v.form.name.minlength">Invalid first name</span>
           </md-field>
 
           <md-field :class="getValidationClass('email')">
             <label for="email">Email</label>
             <md-input type="email" name="email" id="email" autocomplete="email" v-model="form.email" :disabled="sending" />
-            <span class="md-error" v-if="!$v.form.email.required">The email is required</span>
-            <span class="md-error" v-else-if="!$v.form.email.email">Invalid email</span>
+            <span class="md-error" v-if="!$v.form.email.required">É necesário preencher o email</span>
+            <span class="md-error" v-else-if="!$v.form.email.email">Email inválido</span>
           </md-field>
         </md-card-content>
 

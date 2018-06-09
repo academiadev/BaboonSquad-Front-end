@@ -2,7 +2,8 @@
   <div>
     <md-empty-state></md-empty-state>
     <form novalidate class="md-layout md-alignment-top-center" @submit.prevent="validateUser">
-      <md-card class="md-layout-item md-size-45 md-small-size-100">
+      <md-card class="md-layout-item md-size-40 md-small-size-100">
+        
         <md-card-header class="md-layout md-alignment-center">
           <div class="md-title">Cadastro Reembolso ContaAzul</div>
         </md-card-header>
@@ -56,7 +57,7 @@
             <div class="md-layout-item md-small-size-100">
               <md-field :class="getValidationClass('company')">
                 <label for="company" v-if="radio==='Primary'">Inserir nome da empresa</label>
-                <label for="company" v-else="radio==='accent'">Inserir código da empresa</label>
+                <label for="company" v-else-if="radio==='accent'">Inserir código da empresa</label>
                 <md-input name="company" id="company" v-model="form.company"
                           @blur="$v.form.company.$touch()" :disabled="sending" />
                 <span class="md-error" v-if="!$v.form.company.required">É necesário preencher uma empresa</span>
