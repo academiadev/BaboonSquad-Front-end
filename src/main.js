@@ -5,6 +5,8 @@ import Vue from 'vue'
 import axios from 'axios'
 import money from 'v-money'
 import VueMaterial from 'vue-material'
+import VueChartkick from 'vue-chartkick'
+
 import 'vue-material/dist/vue-material.css'
 
 import router from './router'
@@ -23,7 +25,7 @@ Vue.config.productionTip = false
 Vue.use(VueMaterial)
 Vue.use(money, {decimal: ",", thousands: ".", prefix: "R$"})
 Vue.use(VModal)
-
+Vue.use(VueChartkick)
 
 /* eslint-disable no-new */
 new Vue({

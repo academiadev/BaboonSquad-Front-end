@@ -6,7 +6,7 @@
         <md-table-toolbar>
           <h1 class="md-title">Gastos por Categoria</h1>
         </md-table-toolbar>
-
+        <refund-expense-graph />
       </md-table>
     </div>
     <div>
@@ -28,6 +28,8 @@
 
 <script>
   import Reembolso from './Reembolso.vue';
+  import RefundExpenseGraph from './refundExpenseGraph.vue';
+
   export default {
     name: 'TableCard',
     data() {
@@ -73,7 +75,8 @@
       }
     },
     components: {
-      appReembolso: Reembolso
+      appReembolso: Reembolso,
+      refundExpenseGraph: RefundExpenseGraph
     }
   }
 </script>
