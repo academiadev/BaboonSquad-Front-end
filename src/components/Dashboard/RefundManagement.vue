@@ -6,7 +6,7 @@
         <md-button class="md-raised md-accent">Recusar</md-button>
       </div>
       <div>
-        <md-table md-card class="md-alignment-center reembolso-tabela">
+        <md-table md-card md-selected class="md-alignment-center reembolso-tabela">
           <md-table-row>
             <md-table-head>Reembolso</md-table-head>
             <md-table-head>Status</md-table-head>
@@ -14,64 +14,57 @@
             <md-table-head>Categoria</md-table-head>
             <md-table-head>Usuário</md-table-head>
           </md-table-row>
-          <reembolso v-for="reembolso in reembolsos" :reembolso="reembolso" :key="reembolso.id"></reembolso>
+            <refund-item 
+                v-model=refunds 
+                v-for="refund in refunds" 
+                :refund="refund" 
+                :key="refund.id"
+               >
+            </refund-item>
         </md-table>
       </div>
     </div>
     <md-button class="md-fab md-primary botao-reembolso" @click="showDialog = true">
-      <md-icon >add</md-icon>
+      <md-icon >add</md-icon>      
     </md-button>
 
-  <!-- <template>
-  <div>-->
     <md-dialog :md-active.sync="showDialog">
-      <cadastro-reembolsos></cadastro-reembolsos>
+      <refund-edit></refund-edit>
     </md-dialog>
-  <!--</div>
-</template> -->
-
+    
   </div>
 </template>
 
 <script>
-  import Reembolso from './Reembolso.vue';
-  import DadosReembolso from './DadosReembolso.vue';
+  import RefundManagementItem from './RefundManagementItem.vue';
+  import RefundManagementItemEdit from './RefundManagementItemEdit.vue';
   export default {
     data() {
       return {
       showDialog: false,
-      reembolsos: [
-            { id:1, email: "gg", nome: "Testanildo", status:1, valor: 55, categoria: 1, user: "rr"},
-            { id:2, email: "yyy", nome: "Testando", status:0, valor: 87, categoria: 3, user: "rr"},
+      refunds: [
+            { id:1, name: "Testanildo", status:1, value: 55, category: 1, user: "rr"},
+            { id:2, name: "Testando", status:0, value: 87, category: 3, user: "rr"},
                 ]
             }
-
+           
     },
     components: {
-      'reembolso': Reembolso,
-      'cadastro-reembolsos': DadosReembolso
-    },
-    methods: {
-      modal(){
-        alert("abriu modal");
-      }
-    },
-    name: 'DialogPrompt',
-
+      'refund-item': RefundManagementItem,
+      'refund-edit': RefundManagementItemEdit
+    }
   }
 </script>
+
 <style>
-  /*Necessário para aparecer o select dentro da modal*/
-  .md-select-menu {
-    z-index: 11;
-  }
+.md-select-menu {
+    z-index: 100;
+  } 
 
 .reembolso-tabela{
   width: 610px;
     border-radius: 3px;
   background-color: #ffffff;
-  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
-  box-shadow: 0 2px 5px 0 var(--black-26);
   margin-top: 2%;
 }
 
@@ -82,10 +75,10 @@
 
 }
 
-.botao-reembolso{
-  position: fixed;
-  right: 0;
-  margin-right:35px;
-  top: 87%;
-}
+ .botao-reembolso{
+   position: fixed;
+   right: 0;
+   margin-right:35px;
+   top: 87%;
+ }
 </style>
