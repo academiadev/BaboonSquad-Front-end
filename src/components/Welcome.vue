@@ -12,13 +12,7 @@
 
 <script>
   export default {
-    name: 'Home',
-    created() {
-      console.log('oi');
-      console.log(this.$store.getters.isAuthenticated);
-      console.log(localStorage.getItem('token'));
-
-    }
+    name: 'Home'   
   }
   
 

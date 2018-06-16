@@ -85,7 +85,8 @@ export default new Vuex.Store({
             userId: res.data.localId
           })
           dispatch('setLogoutTimer', res.data.expiresIn)
-          router.replace('/').data()
+          router.replace('/')
+
         })
         .catch(error => console.log(error))
     },
@@ -97,7 +98,7 @@ export default new Vuex.Store({
 
       })
       .catch(error => console.log(error))
-      router.replace('/password/message?email='+form.email)
+      router.replace('/password/message')
     },
     tryAutoLogin ({commit}) {
       const token = localStorage.getItem('token')
@@ -155,7 +156,7 @@ export default new Vuex.Store({
       return state.user
     },
     isAuthenticated (state) {
-      return localStorage.getItem('token') !== null;
+      return state.idToken !== null;
     }
   }
 })

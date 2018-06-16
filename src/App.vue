@@ -1,9 +1,7 @@
 <template>
   <div id='App'>
-    <appnavbar v-if="this.$store.getters.isAuthenticated"></appnavbar>
-    <!--<appnavbar></appnavbar>-->
+    <appnavbar v-show="this.$store.getters.isAuthenticated"></appnavbar>
     <router-view></router-view>
-
   </div>
 </template>
 
