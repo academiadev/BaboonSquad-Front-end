@@ -1,7 +1,7 @@
 <template>
-  <div class="status-icon">
+  <div class="status-icon"> 
     <div v-if="status===0" >
-      <md-icon class="green-icon">check_circle</md-icon>
+      <md-icon class="green-icon md-green-icon">check_circle</md-icon>
     </div>
     <div v-else-if="status===1">
       <md-icon class="red-icon" >highlight_off</md-icon>
@@ -20,15 +20,15 @@ export default {
 
 <style lang="scss" scoped>
  .green-icon {
-   color: #c3ff5b;
+   color: #1db817;
  }
 
  .red-icon {
-   color: #ff757d;
+   color: #bb242b;
  }
 
  .yellow-icon {
-   color: #fecf33;
+   color: #ced115;
  }
 
  .status-icon{

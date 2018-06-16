@@ -5,7 +5,7 @@ import Login from '@/components/Auth/Login.vue'
 import Cadastro from '@/components/Auth/Cadastro.vue'
 import Perfil from '@/components/User/Perfil.vue'
 import Gastos from '@/components/Dashboard/Gastos.vue'
-import Reembolsos from '@/components/Dashboard/Reembolsos.vue'
+import RefundManagement from '@/components/Dashboard/RefundManagement.vue'
 import DadosReembolso from '@/components/Dashboard/DadosReembolso.vue'
 import RedefinirSenha from '@/components/password/RedefinirSenha.vue'
 import NovaSenha from '@/components/password/NovaSenha.vue'
@@ -58,7 +58,7 @@ export default new Router({
     {
       path: '/reembolsos',
       name: 'Reembolsos',
-      component: Reembolsos
+      component: RefundManagement
     },
     {
       path: '/reembolsos/dados',

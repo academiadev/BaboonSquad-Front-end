@@ -10,7 +10,7 @@
           <div>
               Confira os dados do reembolso solicitado e os arquivos anexados
           </div>
-          <div class="md-layout md-gutter">
+          <!--<div class="md-layout md-gutter">-->
             <div class="md-layout-item md-small-size-100">
               <md-field :class="getValidationClass('name')">
                 <label for="name">Nome do reembolso</label>
@@ -20,12 +20,12 @@
               </md-field>
             </div>
 
-          </div>
-          <div class="md-layout md-gutter">
-            <div class="md-layout-item">
-              <md-field :class="getValidationClass('gender')">
+          <!--</div>
+          <div class="md-layout md-gutter">-->
+            <div class="md-layout-item md-small-size-100">
+              <md-field  :class="getValidationClass('gender')">
                 <label for="type">Categoria</label>
-                <md-select name="type" id="type" v-model="form.type" md-dense :disabled="sending">
+                <md-select  name="type" id="type" v-model="form.type" md-dense :disabled="sending">
                   <md-option value="">Escolha</md-option>
                   <md-option value="0">Outros</md-option>
                   <md-option value="1">Hospedagem</md-option>
@@ -34,10 +34,10 @@
                 </md-select>
                 <span class="md-error">The gender is required</span>
               </md-field>
-              <div class="md-layout-item md-small-size-100">
-                <md-datepicker v-model="selectedDate" md-immediately />
-              </div>
             </div>
+          <!--</div>-->
+          <div class="md-layout-item md-small-size-100">
+            <md-datepicker v-model="selectedDate" md-immediately />
           </div>
           <div class="md-layout-item md-small-size-100">
             <md-field :class="getValidationClass('value')">
@@ -46,11 +46,14 @@
               <span class="md-error" v-if="!$v.form.age.required">The age is required</span>
               <span class="md-error" v-else-if="!$v.form.age.maxlength">Invalid age</span>
             </md-field>
-          </div>  
-          <md-field>
-            <label>Anexo</label>
-            <md-file v-model="single" />
-          </md-field>
+          </div>
+          <div class="md-layout-item md-small-size-100">
+            <md-field id="cssarquivo">
+              <label>Anexo</label>
+              <md-file v-model="single" />
+            </md-field>
+          </div>
+          <!--</div>-->
         </md-card-content>
 
         <md-progress-bar md-mode="indeterminate" v-if="sending" />
@@ -170,6 +173,22 @@
   .md-card-content {
     padding-left: 50px;
     padding-right: 50px;
-    padding-top: 15px;
+    padding-bottom: 0px;
+    padding-top: 10px;
   }
+
+  .md-card-header {
+  	background: #2687e9;
+  	color: #fff;
+  }
+
+  .md-card-actions {
+  	padding-left: 50px;
+  	padding-right: 50px;
+  }
+
+  #cssarquivo {
+    margin-bottom: 5px;
+  }
+
 </style>
