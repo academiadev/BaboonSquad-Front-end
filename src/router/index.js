@@ -7,8 +7,10 @@ import Perfil from '@/components/User/Perfil.vue'
 import Gastos from '@/components/Dashboard/Gastos.vue'
 import Reembolsos from '@/components/Dashboard/Reembolsos.vue'
 import DadosReembolso from '@/components/Dashboard/DadosReembolso.vue'
-import RedefinirSenha from '@/components/RedefinirSenha.vue'
-import NovaSenha from '@/components/NovaSenha.vue'
+import RedefinirSenha from '@/components/password/RedefinirSenha.vue'
+import NovaSenha from '@/components/password/NovaSenha.vue'
+import MessageRedefine from '@/components/password/MessageRedefine.vue'
+
 
 import store from '../store'
 
@@ -64,14 +66,19 @@ export default new Router({
       component: DadosReembolso
     },
     {
-      path: '/redefinirsenha',
+      path: '/password/redefinirsenha',
       name: 'RedefinirSenha',
       component: RedefinirSenha
     },
     {
-      path: '/novasenha',
+      path: '/password/novasenha',
       name: 'NovaSenha',
       component: NovaSenha
+    },
+    {
+      path: '/password/message',
+      name: 'MessageRedefine',
+      component: MessageRedefine
     }
   ]
 })

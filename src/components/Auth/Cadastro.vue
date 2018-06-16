@@ -27,10 +27,6 @@
             <span class="md-error" v-else-if="!$v.form.email.email">Email inválido</span>
           </md-field>
 
-          <!-- <div class="md-layout-item md-small-size-100">
-              <adevpassword v-model="form.password" ></adevpassword>
-          </div> -->
-
           <div class="md-layout-item md-small-size-100">
             <md-field :class="getValidationClass('password')">
               <label for="password">Senha</label>
@@ -52,18 +48,25 @@
               </md-field>
             </div>
 
-            <md-radio v-model="radio" value="Primary" class="md-primary">Inserir código existente </md-radio>
-            <md-radio v-model="radio" value="accent">Criar nova empresa  <small>(Admin)</small></md-radio>
-            <div class="md-layout-item md-small-size-100">
+            <md-radio v-model="radio" :value=2 class="md-primary">Inserir código existente {{radio}} </md-radio>
+            <md-radio v-model="radio" :value=1  class="md-primary">Criar nova empresa  <small>(Admin)</small></md-radio>
+            
+            <div class="md-layout-item md-small-size-100"  v-if="radio===1">
               <md-field :class="getValidationClass('company')">
-                <label for="company" v-if="radio==='Primary'">Inserir nome da empresa</label>
-                <label for="company" v-else-if="radio==='accent'">Inserir código da empresa</label>
-                <md-input name="company" id="company" v-model="form.company"
-                          @blur="$v.form.company.$touch()" :disabled="sending" />
+                <label for="company" v-if="radio===2">Inserir código da empresa</label>
+                <label for="company">Inserir nome da empresa</label>
+                <md-input name="company-name" id="company-name" v-model="form.company.name" @blur="$v.form.company.$touch()" :disabled="sending" />
                 <span class="md-error" v-if="!$v.form.company.required">É necesário preencher uma empresa</span>
               </md-field>
             </div>
-          <div>
+            <div class="md-layout-item md-small-size-100" v-if="radio===2">
+              <md-field :class="getValidationClass('company')">
+                <label for="company" >Inserir código da empresa</label>
+                <md-input name="company-code" id="company-code" v-model="form.company.code" @blur="$v.form.company.$touch()" :disabled="sending" />
+                <span class="md-error" v-if="!$v.form.company.required">É necesário preencher uma empresa</span>
+              </md-field>
+            </div>
+          <div>    
 
           </div>
         </md-card-content>
@@ -71,7 +74,7 @@
         <md-progress-bar md-mode="indeterminate" v-if="sending" />
 
         <md-card-actions>
-          <md-button type="submit"  class="md-dense md-raised md-primary" :disabled="sending">Cadastrar</md-button>
+          <md-button type="submit" class="md-dense md-raised md-primary" :disabled="sending">Cadastrar</md-button>
         </md-card-actions>
 
 
@@ -102,9 +105,12 @@
         email: null,
         password: null,
         confirmPassword: null,
-        company: null
+        company: {
+          name: null,
+          code: null
+        }
       },
-      radio: 'Primary',
+      radio: 1,
       userSaved: false,
       sending: false,
       lastUser: null
@@ -162,18 +168,12 @@
           name: this.form.name,
           email: this.form.email,
           password: this.form.password,
-          confirmPassword: this.form.confirmPassword,
-          company: this.form.company
-        }
+          company: this.form.company,
+          typePermission: this.radio
+      }
         console.log(formData)
-        this.$store.dispatch('signup', {email: formData.email, password: formData.password})
+         this.$store.dispatch('save', formData).then(res => { console.log(res) } ).catch(erro => console.log(error) )
 
-        // axios.post('https://reembolsoazul-8f884.firebaseio.com/users.json', formData)
-        //   .then(res => {this.lastUser = `${this.form.name}`
-        //                 this.userSaved = true
-        //                 this.sending = false
-        //                 this.clearForm()})
-        //   .catch(erro => console.log(error))
       },
       validateUser () {
         this.$v.$touch()

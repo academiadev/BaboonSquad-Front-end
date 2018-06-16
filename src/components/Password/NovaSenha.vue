@@ -6,9 +6,7 @@
         <md-card-header class="md-layout md-alignment-center">
           <div class="md-title">Cadastre uma nova senha</div>
         </md-card-header>
-
         <md-card-content>
-
           <div class="md-layout-item md-small-size-100">
               <adevpassword v-model="form.password" v-on:isValid="validatePassword"></adevpassword>
           </div>
@@ -33,12 +31,11 @@
 
       <md-snackbar :md-active.sync="userSaved">Senha alterada com sucesso!</md-snackbar>
     </form>
-    <p>{{$v}}</p>
   </div>
 </template>
 
 <script>
-  import Password from './Shared/Password.vue'
+  import Password from '../Shared/Password.vue'
   import { validationMixin } from 'vuelidate'
   import {
     required,
@@ -60,8 +57,9 @@
     }),
     validations: {
       form: {
-        password: {
-
+        password: { 
+          required,
+          minLength: minLength(3)
         },
         confirmPassword: {
           required,
@@ -78,6 +76,11 @@
             'md-invalid': field.$invalid && field.$dirty
           }
         }
+      },
+      clearForm () {
+        this.$v.$reset()
+        this.form.password = null
+        this.form.confirmPassword = null
       },
       validatePassword (value) {
         this.$v.password.$invalid = value

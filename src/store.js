@@ -54,6 +54,19 @@ export default new Vuex.Store({
         })
         .catch(error => console.log(error))
     },
+    save({commit, dispatch}, form){
+      axios.post('pessoa/gravar',{
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        typePermission: form.typePermission,
+        company: form.company
+      })
+        .then( res =>{
+          console.log(res)
+        })
+    }
+    ,
     login ({commit, dispatch}, authData) {
       axios.post('auth/login', {
         email: authData.email,
@@ -63,8 +76,8 @@ export default new Vuex.Store({
         .then(res => {
           console.log(res)
           const now = new Date()
-          const expirationDate = new Date(now.getTime() + res.data.expiresIn * 1000)
-          localStorage.setItem('token', res.data.idToken)
+          const expirationDate = new Date(now.getTime() + res.data.expires_in * 1000)
+          localStorage.setItem('token', res.data.access_token)
           localStorage.setItem('userId', res.data.localId)
           localStorage.setItem('expirationDate', expirationDate)
           commit('authUser', {
@@ -72,8 +85,19 @@ export default new Vuex.Store({
             userId: res.data.localId
           })
           dispatch('setLogoutTimer', res.data.expiresIn)
+          router.replace('/').data()
         })
         .catch(error => console.log(error))
+    },
+    redefinePassword({commit, dispatch}, form){
+      axios.post('/password/request', {
+        email: form.email,
+      }).then(res =>{
+        console.log(res)
+
+      })
+      .catch(error => console.log(error))
+      router.replace('/password/message?email='+form.email)
     },
     tryAutoLogin ({commit}) {
       const token = localStorage.getItem('token')
@@ -131,7 +155,7 @@ export default new Vuex.Store({
       return state.user
     },
     isAuthenticated (state) {
-      return state.idToken !== null
+      return localStorage.getItem('token') !== null;
     }
   }
 })

@@ -19,7 +19,7 @@
           <div class="md-layout-item md-small-size-100">
             <md-field :class="getValidationClass('password')">
               <label for="password">Password</label>
-              <md-input name="password" id="password" v-model="form.password" :disabled="sending" />
+              <md-input type="password" name="password" id="password" v-model="form.password" :disabled="sending" />
               <span class="md-error" v-if="!$v.form.password.required">The password is required</span>
               <span class="md-error" v-else-if="!$v.form.password.minlength">Invalid password</span>
             </md-field>
@@ -32,12 +32,10 @@
           <md-button type="submit"  class="md-dense md-raised md-primary" :disabled="sending">Login</md-button>
         </md-card-actions>
         <div class="md-layout md-alignment-center">
-          <md-button to="./redefinirsenha">ESQUECI MINHA SENHA</md-button>
+          <md-button to="../password/redefinirsenha">ESQUECI MINHA SENHA</md-button>
           <md-button to="./cadastro">QUERO ME CADASTRAR </md-button>
         </div>
       </md-card>
-
-      <md-snackbar :md-active.sync="userSaved">The user {{ lastUser }} was saved with success!</md-snackbar>
     </form>
   </div>
 </template>
@@ -92,16 +90,9 @@
       },
       saveUser () {
         this.sending = true
-
-        this.$store.dispatch('login', {email: this.form.email, password: this.form.password})  
+        this.$store.dispatch('login', {email: this.form.email, password: this.form.password})
           this.userSaved = true
           this.sending = false
-
-      },
-      OnSubimit () {
-        const formData = {
-
-        }
       },
       validateUser () {
         this.$v.$touch()

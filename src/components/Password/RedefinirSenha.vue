@@ -21,7 +21,7 @@
         <md-progress-bar md-mode="indeterminate" v-if="sending" />
 
         <md-card-actions>
-          <md-button class="md-dense md-raised md-primary" to="./novasenha">REDEFIR SENHA</md-button>
+          <md-button type="submit" class="md-dense md-raised md-primary" >REDEFIR SENHA</md-button>
         </md-card-actions>
       </md-card>
 
@@ -44,8 +44,7 @@
     mixins: [validationMixin],
     data: () => ({
       form: {
-        email: null,
-        password: null,
+        email: null
       },
       userSaved: false,
       sending: false,
@@ -56,10 +55,6 @@
         email: {
           required,
           email
-        },
-        password: {
-          required,
-          minLength: minLength(3)
         }
       }
     },
@@ -73,9 +68,17 @@
           }
         }
       },
+      OnSubmit () {
+        this.sending = true
+        const formData = {
+          email: this.form.email,
+      }
+        console.log(formData)
+        this.$store.dispatch('redefinePassword', formData).then(res => { console.log(res) } ).catch(erro => console.log(error) )
+
+      },
       clearForm () {
         this.$v.$reset()
-        this.form.password = null
         this.form.email = null
       },
       saveUser () {
@@ -92,7 +95,9 @@
         this.$v.$touch()
 
         if (!this.$v.$invalid) {
-          this.saveUser()
+          this.OnSubmit()
+        }else {
+            this.sending = false
         }
       }
     }
