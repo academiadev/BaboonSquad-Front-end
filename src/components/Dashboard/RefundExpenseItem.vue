@@ -10,7 +10,7 @@
 </template>
 
 <script>
-  import Status from './StatusReembolso.vue';
+  import Status from './RefundStatus.vue';
 
   export default {
     props: ['reembolso'],

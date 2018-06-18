@@ -9,7 +9,7 @@
               <label for="first-name">Nome</label>
               <md-input name="name" id="name" autocomplete="name" v-model="form.name" :disabled="sending" />
               <span class="md-error" v-if="!$v.form.name.required">É necessário informar o nome</span>
-              <span class="md-error" v-else-if="!$v.form.name.minlength">Invalid first name</span>
+              <span class="md-error" v-else-if="!$v.form.name.minlength">O nome deve possuir mais de </span>
           </md-field>
 
           <md-field :class="getValidationClass('email')">

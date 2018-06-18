@@ -27,7 +27,7 @@
 </template>
 
 <script>
-  import Reembolso from './Reembolso.vue';
+  import Reembolso from './RefundExpenseItem.vue';
   import RefundExpenseGraph from './refundExpenseGraph.vue';
 
   export default {

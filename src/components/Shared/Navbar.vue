@@ -4,26 +4,42 @@
     <md-button class="md-icon-button" @click="showNavigation = true">
       <md-icon>menu</md-icon>
     </md-button>
-    <span class="md-title">ReembolsoAzul</span>
+    <md-button class="md-title" to='/'>ReembolsoAzul</md-button>
+
+    <md-button v-show="isAdmin" class="md-raised">
+      <md-icon>filter_none</md-icon>
+      {{ company }}
+    </md-button>
   </md-toolbar>
 
   <md-drawer :md-active.sync="showNavigation">
     <md-toolbar md-elevation="0">
-        <span class="md-title whitetitle">Reembolso ContaAzul</span>
+      <div  class="md-list-item-text">
+        <span id="ca-title"  class="md-title"> Reembolso ContaAzul </span>
+        <span id="user-title"  class="md-title">{{ user }}</span>
+        <span id="email-title" class="md-title">{{ email }}</span>
+      </div>
     </md-toolbar>
 
     <md-list @click="showNavigation=false">
-      <md-list-item to='/reembolsos'><md-icon>home</md-icon>Histórico e Solicitações</md-list-item>
+      <md-list-item to='/reembolsos'>
+        <md-icon>home</md-icon>
+        <span class="md-list-item-text">Histórico de Solicitações</span>
+      </md-list-item>
 
-      <md-list-item to='/gastos'> <md-icon>dashboard</md-icon>Dashboard de Gatos
+      <md-list-item to='/gastos'> 
+        <md-icon>dashboard</md-icon>
+        <span class="md-list-item-text">Dashboard de Gatos</span>
       </md-list-item>
 
       <md-list-item to='/perfil'>
-          <md-icon>perm_identity</md-icon>Perfil
+          <md-icon>perm_identity</md-icon>
+          <span class="md-list-item-text">Perfil</span>
       </md-list-item>
 
       <md-list-item @click="onLogout">
-          <md-icon>input</md-icon>Sair
+          <md-icon>input</md-icon>
+          <span class="md-list-item-text">Sair</span>
       </md-list-item>
     </md-list>
   </md-drawer>
@@ -37,8 +53,17 @@
       showNavigation: false
     }),
     computed: {
-      auth () {
-        return this.$store.getters.isAuthenticated
+      user () {
+        return this.$store.getters.user 
+      },
+      isAdmin () {
+        return this.$store.getters.isAdmin 
+      },
+      company () {
+        return this.$store.getters.company 
+      },
+      email () {
+        return this.$store.getters.email 
       }
     },
     methods: {
@@ -64,7 +89,7 @@
     background: #2687e9;
   }
 
-  .whitetitle {
+  #ca-title, #user-title, #email-title {
     color: #fff;
   }
 </style>

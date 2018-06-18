@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="container">
-      <div>
+      <div v-show="auth">
         <md-button class="md-raised md-primary">Aprovar</md-button>
         <md-button class="md-raised md-accent">Recusar</md-button>
       </div>
@@ -14,11 +14,11 @@
             <md-table-head>Categoria</md-table-head>
             <md-table-head>Usuário</md-table-head>
           </md-table-row>
-            <refund-item 
+            <refund-item
                 v-model=refunds 
                 v-for="refund in refunds" 
                 :refund="refund" 
-                :key="refund.id"
+                :key="refund.id"    
                >
             </refund-item>
         </md-table>
@@ -45,9 +45,15 @@
       refunds: [
             { id:1, name: "Testanildo", status:1, value: 55, category: 1, user: "rr"},
             { id:2, name: "Testando", status:0, value: 87, category: 3, user: "rr"},
+            { id:3, name: "Money", status: 2, value:66.6, category: 0, user: "pancho"}
                 ]
             }
            
+    },
+    computed: {
+      auth () {
+        return this.$store.getters.isAuthenticated
+      }
     },
     components: {
       'refund-item': RefundManagementItem,

@@ -14,7 +14,7 @@
               <label for="name">Nome do reembolso</label>
               <md-input name="name" id="name" autocomplete="given-name" v-model="form.name" :disabled="sending" />
               <span class="md-error" v-if="!$v.form.name.required">É necesario nomear o reembolso</span>
-              <span class="md-error" v-else-if="!$v.form.name.minlength">O nome do reembolso deve possuir mais de 3 letras</span>
+              <span class="md-error" v-else-if="!$v.form.name.minlength">O nome do reembolso deve possuir mais de {{ $v.name.$params.minLength }} letras</span>
             </md-field>
           
 
@@ -31,15 +31,14 @@
             <span class="md-error">O reembolso deve possuir uma categoria</span>
           </md-field>
           
-
-        
-          <md-datepicker :class="getValidationClass('date')" v-model="selectedDate" md-immediately />
-        
+          <md-datepicker :class="getValidationClass('date')" v-model="form.date" md-immediately />
         
           <md-field :class="getValidationClass('value')">
             <label for="value">Valor</label>
             <md-input type="number" id="value" name="value" v-model="form.value" :disabled="sending" />
-            <span class="md-error" v-if="!$v.form.value.required">The age is required</span>
+            <span class="md-error" v-if="!$v.form.value.required">Informe o valor do reembolso</span>
+            <span class="md-error" v-else-if="!$v.form.value.numeric">Informe um valor válido para o reembolso</span>
+            <span class="md-error" v-else-if="!$v.form.value.minValue">Informe um valor maior que zero para o reembolso</span>
           </md-field>
         
         
@@ -66,11 +65,13 @@
   import { validationMixin } from 'vuelidate'
   import {
     required,
-    minLength
+    numeric,
+    minLength,
+    minValue
   } from 'vuelidate/lib/validators'
 
   export default {
-    props: ['cadastro-reembolsos'],
+    props: ['refund'],
     name: 'DadosReembolso',
     mixins: [validationMixin],
     data: () => ({
@@ -81,7 +82,7 @@
         value: null,
         file: null,
       },
-      selectedDate: new Date('2018/03/26'),
+      //selectedDate: new Date('2018/03/26'),
       userSaved: false,
       sending: false,
       lastUser: null
@@ -99,7 +100,9 @@
           required
         },
         value: {
-          required
+          required,
+          numeric,
+          vinValue: minValue(0.01)
         },
         file: {
           required
