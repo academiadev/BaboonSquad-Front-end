@@ -5,11 +5,11 @@
       <md-card class="md-layout-item md-size-40 md-small-size-100">
 
         <md-card-content>
-          <md-field :class="getValidationClass('firstName')">
+          <md-field :class="getValidationClass('name')">
               <label for="first-name">Nome</label>
               <md-input name="name" id="name" autocomplete="name" v-model="form.name" :disabled="sending" />
               <span class="md-error" v-if="!$v.form.name.required">É necessário informar o nome</span>
-              <span class="md-error" v-else-if="!$v.form.name.minlength">O nome deve possuir mais de </span>
+              <span class="md-error" v-else-if="!$v.form.name.minlength">O nome deve possuir mais de {{ $v.form.name.$params.minLength.min}} letras </span>
           </md-field>
 
           <md-field :class="getValidationClass('email')">
@@ -47,9 +47,9 @@
   } from 'vuelidate/lib/validators'
 
   export default {
-    name: 'FormValidation',
     mixins: [validationMixin],
     data: () => ({
+      title: "Perfil",
       form: {
         name: null,
         email: null,
@@ -82,10 +82,7 @@
       },
       clearForm () {
         this.$v.$reset()
-        this.form.firstName = null
-        this.form.lastName = null
-        this.form.age = null
-        this.form.gender = null
+        this.form.name = null
         this.form.email = null
       },
       saveUser () {
@@ -106,6 +103,11 @@
           this.saveUser()
         }
       }
+    },
+    created () {
+      this.$store.commit('changeTitle', this.title)
+      this.form.name = this.$store.getters.user 
+      this.form.email = this.$store.getters.email  
     }
   }
 </script>

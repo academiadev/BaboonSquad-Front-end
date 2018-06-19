@@ -4,17 +4,18 @@ import axios from './axios-auth'
 import globalAxios from 'axios'
 
 import router from './router/index'
-import { stat } from 'fs';
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    title: "ReembolsoAzul",
     idToken: null,
     user: null,
     email: null,
     company: null,
-    isAdmin: false
+    isAdmin: false,
+    refundCategory: ["Outros", "Hospedagem", "Transporte", "Alimentação"]
   },
 
   mutations: {
@@ -30,8 +31,8 @@ export default new Vuex.Store({
       state.company = payload.company,
       state.isAdmin = payload.isAdmin
     },
-    storeUser (state, user) {
-      state.user = user
+    changeTitle (state, title){
+      state.title = title
     },
     clearAuthData (state) {
       state.idToken = null
@@ -59,8 +60,11 @@ export default new Vuex.Store({
         .then( res =>{
           console.log(res)
         })
-    }
-    ,
+        .catch(error => console.log(error))
+    },
+    getRefundByUser (){
+      axios.get('reembolso/')
+    },
     login ({commit, dispatch}, authData) {
       axios.post('auth/login', {
         email: authData.email,
@@ -111,14 +115,6 @@ export default new Vuex.Store({
       localStorage.removeItem('expirationDate')
       localStorage.removeItem('token')
       router.replace('/login')
-    },
-    storeUser ({commit, state}, userData) {
-      if (!state.idToken) {
-        return
-      }
-      globalAxios.post('/users.json' + '?auth=' + state.idToken, userData)
-        .then(res => console.log(res))
-        .catch(error => console.log(error))
     }
   },
   getters: {
@@ -134,8 +130,16 @@ export default new Vuex.Store({
     isAdmin(state) {
       return state.isAdmin
     },
+    title (state) {
+      return state.title
+    },
     isAuthenticated (state) {
       return state.idToken !== null;
+    },
+    refundCategory(state){
+      return state.refundCategory
+
     }
+
   }
 })

@@ -4,10 +4,10 @@
     <md-button class="md-icon-button" @click="showNavigation = true">
       <md-icon>menu</md-icon>
     </md-button>
-    <md-button class="md-title" to='/'>ReembolsoAzul</md-button>
+    <md-button class="md-title" to='/'>{{ title }}</md-button>
 
     <md-button v-show="isAdmin" class="md-raised">
-      <md-icon>filter_none</md-icon>
+      <md-icon id="icon-company">filter_none</md-icon>
       {{ company }}
     </md-button>
   </md-toolbar>
@@ -33,7 +33,7 @@
       </md-list-item>
 
       <md-list-item to='/perfil'>
-          <md-icon>perm_identity</md-icon>
+          <md-icon>person</md-icon>
           <span class="md-list-item-text">Perfil</span>
       </md-list-item>
 
@@ -53,6 +53,9 @@
       showNavigation: false
     }),
     computed: {
+      title() {
+        return this.$store.getters.title 
+      },
       user () {
         return this.$store.getters.user 
       },
@@ -91,5 +94,9 @@
 
   #ca-title, #user-title, #email-title {
     color: #fff;
+  }
+
+  #icon-company {
+    color: #000;
   }
 </style>
