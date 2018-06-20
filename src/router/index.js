@@ -46,13 +46,13 @@ export default new Router({
       path: '/gastos',
       name: 'Gastos',
       component: Gastos,
-      beforeEnter (to, from, next) {
-      if (store.state.idToken) {
-        next()
-      } else {
-        next('/login')
+      beforeEnter(to, from, next) {
+        if (store.state.idToken) {
+          next()
+        } else {
+          next('/login')
+        }
       }
-    }
     },
     {
       path: '/reembolsos',

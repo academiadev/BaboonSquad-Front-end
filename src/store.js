@@ -11,28 +11,32 @@ export default new Vuex.Store({
   state: {
     idToken: null,
     userId: null,
-    user: null
+    user: null,
+    refunds: null
   },
   mutations: {
-    authUser (state, userData) {
+    authUser(state, userData) {
       state.idToken = userData.token
       state.userId = userData.userId
     },
-    storeUser (state, user) {
+    storeUser(state, user) {
       state.user = user
     },
-    clearAuthData (state) {
+    clearAuthData(state) {
       state.idToken = null
       state.userId = null
+    },
+    setRefunds(state) {
+      refunds = state.data;
     }
   },
   actions: {
-    setLogoutTimer ({commit}, expirationTime) {
+    setLogoutTimer({ commit }, expirationTime) {
       setTimeout(() => {
         commit('clearAuthData')
       }, expirationTime * 1000)
     },
-    signup ({commit, dispatch}, authData) {
+    signup({ commit, dispatch }, authData) {
       axios.post('/signupNewUser?key=AIzaSyC88D7GaIUv3CCn602xSjB6ZB4XNmh-AZk', {
         email: authData.email,
         password: authData.password,
@@ -54,20 +58,20 @@ export default new Vuex.Store({
         })
         .catch(error => console.log(error))
     },
-    save({commit, dispatch}, form){
-      axios.post('pessoa/gravar',{
+    save({ commit, dispatch }, form) {
+      axios.post('pessoa/gravar', {
         name: form.name,
         email: form.email,
         password: form.password,
         typePermission: form.typePermission,
         company: form.company
       })
-        .then( res =>{
+        .then(res => {
           console.log(res)
         })
     }
     ,
-    login ({commit, dispatch}, authData) {
+    login({ commit, dispatch }, authData) {
       axios.post('auth/login', {
         email: authData.email,
         password: authData.password,
@@ -90,17 +94,17 @@ export default new Vuex.Store({
         })
         .catch(error => console.log(error))
     },
-    redefinePassword({commit, dispatch}, form){
+    redefinePassword({ commit, dispatch }, form) {
       axios.post('/password/request', {
         email: form.email,
-      }).then(res =>{
+      }).then(res => {
         console.log(res)
 
       })
-      .catch(error => console.log(error))
+        .catch(error => console.log(error))
       router.replace('/password/message')
     },
-    tryAutoLogin ({commit}) {
+    tryAutoLogin({ commit }) {
       const token = localStorage.getItem('token')
       if (!token) {
         return
@@ -116,14 +120,14 @@ export default new Vuex.Store({
         userId: userId
       })
     },
-    logout ({commit}) {
+    logout({ commit }) {
       commit('clearAuthData')
       localStorage.removeItem('expirationDate')
       localStorage.removeItem('token')
       localStorage.removeItem('userId')
       router.replace('/login')
     },
-    storeUser ({commit, state}, userData) {
+    storeUser({ commit, state }, userData) {
       if (!state.idToken) {
         return
       }
@@ -131,7 +135,7 @@ export default new Vuex.Store({
         .then(res => console.log(res))
         .catch(error => console.log(error))
     },
-    fetchUser ({commit, state}) {
+    fetchUser({ commit, state }) {
       if (!state.idToken) {
         return
       }
@@ -149,13 +153,25 @@ export default new Vuex.Store({
           commit('storeUser', users[0])
         })
         .catch(error => console.log(error))
+    },
+    getRefundExpense({ commit, state }) {
+      console.log('aa', 'Bearer ' + state.idToken);
+      var config = {
+        headers: { 'Authorization': 'Bearer ' + state.idToken }
+      };
+      axios.get('/reembolso/listaReembolsosCategoria/', config)
+        .then(res => {
+          console.log(res);
+          commit('setRefunds', res)
+        })
+        .catch(error => console.error(error))
     }
   },
   getters: {
-    user (state) {
+    user(state) {
       return state.user
     },
-    isAuthenticated (state) {
+    isAuthenticated(state) {
       return state.idToken !== null;
     }
   }
