@@ -1,5 +1,5 @@
 <template>
-      <md-table-row slot="md-table-row" :slot-scope="refund" md-selectable="multiple" md-auto-select>
+      <md-table-row @click="showDialog=true"  slot="md-table-row" :slot-scope="refund" md-selectable="multiple" md-auto-select>
         <md-table-cell md-label="refund" md-sort-by="refund">{{ refund.name }}</md-table-cell>
         <md-table-cell md-label="Status" md-sort-by="status"><refund-status :status="refund.status"></refund-status></md-table-cell>
         <md-table-cell md-label="Valor" md-sort-by="valor">{{ refund.value }}</md-table-cell>
@@ -13,6 +13,11 @@
 
   export default {
     props: ['refund'],
+    data() {
+      return {
+        showDialog: false       
+      }
+    },    
     components: {
       'refund-status': Status
     }

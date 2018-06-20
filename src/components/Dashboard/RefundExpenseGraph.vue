@@ -9,28 +9,13 @@
 export default {
   data() {
     return {
-      data: this.values,
+      data: this.$store.getters.refundsExpenseGraph,
       max: 50,
       count: 0
     };
   },
   created() {
-    this.$store
-      .dispatch("getRefundExpense")
-      .then(res => {
-        // console.log("1", res.refounds);
-
-        // this.values = res.data.map(element => {
-        //   this.state = {};
-        //   this.state.data[res.date] = res.value;
-        //   this.state.nome = res.category;
-
-        //   return this.state;
-        // });
-
-        // console.log("2", this.values);
-      })
-      .catch(res => console.log(res));
+    this.$store.dispatch("getRefundExpense");
   }
 };
 </script>

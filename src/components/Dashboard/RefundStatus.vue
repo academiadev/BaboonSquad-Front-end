@@ -1,13 +1,13 @@
 <template>
   <div class="status-icon"> 
     <div v-if="status===0" >
-      <md-icon class="green-icon md-green-icon">check_circle</md-icon>
+      <md-icon id="icon-ok">check_circle</md-icon>
     </div>
     <div v-else-if="status===1">
-      <md-icon class="red-icon" >highlight_off</md-icon>
+      <md-icon id="icon-cancel" >cancel</md-icon>
     </div>
     <div v-else >
-      <md-icon class="yellow-icon">schedule</md-icon>
+      <md-icon id="icon-wait">watch_later</md-icon>
     </div>
   </div>
 </template>
@@ -19,20 +19,17 @@ export default {
 </script >
 
 <style lang="scss" scoped>
- .green-icon {
+
+  #icon-ok {
    color: #1db817;
  }
 
- .red-icon {
+  #icon-cancel {
    color: #bb242b;
  }
 
- .yellow-icon {
-   color: #ced115;
+  #icon-wait{
+   color: #eca409dc;
  }
 
- .status-icon{
-   padding: 0;
-   margin: 0;
- }
 </style>
