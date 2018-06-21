@@ -10,25 +10,46 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    title: "ReembolsoAzul",
     idToken: null,
-    userId: null,
-    user: null
+    user: null,
+    email: null,
+    company: null,
+    isAdmin: false,
+    refundCategory: ["Outros", "Hospedagem", "Transporte", "Alimentação"],
+    refundsExpenseGraph: [],
   },
+
   mutations: {
-    authUser (state, userData) {
+    authUser(state, userData) {
       state.idToken = userData.token
-      state.userId = userData.userId
+
+      var base64Url = state.idToken.split('.')[1];
+      var base64 = base64Url.replace('-', '+').replace('_', '/');
+      var payload = JSON.parse(window.atob(base64));
+
+      state.user = payload.name,
+        state.email = payload.email,
+        state.company = payload.company,
+        state.isAdmin = payload.isAdmin
     },
-    storeUser (state, user) {
-      state.user = user
+    changeTitle(state, title) {
+      state.title = title
     },
-    clearAuthData (state) {
-      state.idToken = null
-      state.userId = null
-    }
+    clearAuthData(state) {
+      state.idToken = null;
+      state.user = null;
+      emai = null;
+      company = null;
+      isAdmin = false;
+    },
+    setRefunds(state, data) {
+      state.refundsExpenseGraph = data;
+    },
   },
+
   actions: {
-    setLogoutTimer ({commit}, expirationTime) {
+    setLogoutTimer({ commit }, expirationTime) {
       setTimeout(() => {
         commit('clearAuthData')
       }, expirationTime * 1000)
@@ -41,11 +62,16 @@ export default new Vuex.Store({
         typePermission: form.typePermission,
         company: form.company
       })
-      .then( res =>{
-        router.replace('/login')
-      }).catch(error => console.log(error.response))
+        .then(res => {
+          console.log(res)
+        })
+
+        .catch(error => console.log(error))
     },
-    login ({commit, dispatch}, authData) {
+    getRefundByUser() {
+      axios.get('reembolso/')
+    },
+    login({ commit, dispatch }, authData) {
       axios.post('auth/login', {
         email: authData.email,
         password: authData.password,
@@ -55,7 +81,6 @@ export default new Vuex.Store({
           const now = new Date()
           const expirationDate = new Date(now.getTime() + res.data.expires_in * 1000)
           localStorage.setItem('token', res.data.access_token)
-          localStorage.setItem('userId', res.data.localId)
           localStorage.setItem('expirationDate', expirationDate)
           commit('authUser', {
             token: res.data.access_token,
@@ -92,7 +117,7 @@ export default new Vuex.Store({
       })
       .catch(error => console.log(error))
     },
-    tryAutoLogin ({commit}) {
+    tryAutoLogin({ commit }) {
       const token = localStorage.getItem('token')
       if (!token) {
         return
@@ -102,56 +127,54 @@ export default new Vuex.Store({
       if (now >= expirationDate) {
         return
       }
-      const userId = localStorage.getItem('userId')
       commit('authUser', {
-        token: token,
-        userId: userId
+        token: token
       })
     },
-    logout ({commit}) {
+    logout({ commit }) {
       commit('clearAuthData')
       localStorage.removeItem('expirationDate')
       localStorage.removeItem('token')
-      localStorage.removeItem('userId')
       router.replace('/login')
     },
-    storeUser ({commit, state}, userData) {
-      if (!state.idToken) {
-        return
-      }
-      globalAxios.post('/users.json' + '?auth=' + state.idToken, userData)
-        .then(res => console.log(res))
-        .catch(error => console.log(error))
-    },
-    fetchUser ({commit, state}) {
-      if (!state.idToken) {
-        return
-      }
-      globalAxios.get('/users.json' + '?auth=' + state.idToken)
+    getRefundExpense({ commit, state }) {
+      console.log('aa', 'Bearer ' + state.idToken);
+      var config = {
+        headers: { 'Authorization': 'Bearer ' + state.idToken }
+      };
+      axios.get('/reembolso/listaReembolsosCategoria/', config)
         .then(res => {
-          console.log(res)
-          const data = res.data
-          const users = []
-          for (let key in data) {
-            const user = data[key]
-            user.id = key
-            users.push(user)
-          }
-          console.log(users)
-          commit('storeUser', users[0])
+          console.log(res);
+          //ver o que veio de retorno e passar pro setRefounds atualizar o grafico
+          commit('setRefunds', res)
         })
-        .catch(error => console.log(error))
+        .catch(error => console.error(error))
     }
   },
   getters: {
-    user (state) {
+    user(state) {
       return state.user
     },
-    isAuthenticated (state) {
+    email(state) {
+      return state.email
+    },
+    company(state) {
+      return state.company
+    },
+    isAdmin(state) {
+      return state.isAdmin
+    },
+    title(state) {
+      return state.title
+    },
+    isAuthenticated(state) {
       return state.idToken !== null;
     },
-    haveErros(){
-      return error.response;
+    refundCategory(state) {
+      return state.refundCategory
+    },
+    refundsExpenseGraph(state) {
+      return state.refundsExpenseGraph
     }
   }
 })

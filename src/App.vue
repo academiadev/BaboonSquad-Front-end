@@ -1,6 +1,6 @@
 <template>
   <div id='App'>
-    <appnavbar v-show="this.$store.getters.isAuthenticated"></appnavbar>
+    <appnavbar v-show="auth"></appnavbar>
     <router-view></router-view>
   </div>
 </template>
@@ -14,6 +14,11 @@ import Navbar from './components/Shared/Navbar.vue';
     }),
     components: {
       appnavbar: Navbar
+    },
+    computed: {
+      auth () {
+        return this.$store.getters.isAuthenticated
+      }
     },
     created () {
       this.$store.dispatch('tryAutoLogin')

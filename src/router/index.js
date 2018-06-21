@@ -4,7 +4,7 @@ import Welcome from '@/components/Welcome.vue'
 import Login from '@/components/Auth/Login.vue'
 import Cadastro from '@/components/Auth/Cadastro.vue'
 import Perfil from '@/components/User/Perfil.vue'
-import Gastos from '@/components/Dashboard/Gastos.vue'
+import RefundExpenses from '@/components/Dashboard/RefundExpense.vue'
 import RefundManagement from '@/components/Dashboard/RefundManagement.vue'
 import RedefinirSenha from '@/components/password/RedefinirSenha.vue'
 import NewPassword from '@/components/password/NewPassword.vue'
@@ -30,39 +30,75 @@ export default new Router({
     {
       path: '/login',
       name: 'Login',
-      component: Login
+      component: Login,
+      beforeEnter (to, from, next) {
+        if (!store.state.idToken) {
+          next()
+        } else {
+          next('/reembolsos')
+        }
+      }
     },
     {
       path: '/cadastro',
       name: 'Cadastro',
-      component: Cadastro
+      component: Cadastro,
+      beforeEnter (to, from, next) {
+        if (!store.state.idToken) {
+          next()
+        } else {
+          next('/reembolsos')
+        }
+      }
     },
     {
       path: '/perfil',
       name: 'Perfil',
-      component: Perfil
+      component: Perfil,
+      beforeEnter (to, from, next) {
+        if (store.state.idToken) {
+          next()
+        } else {
+          next('/login')
+        }
+      }
     },
     {
       path: '/gastos',
       name: 'Gastos',
-      component: Gastos,
-      beforeEnter (to, from, next) {
-      if (store.state.idToken) {
-        next()
-      } else {
-        next('/login')
+      component: RefundExpenses,
+      beforeEnter(to, from, next) {
+        if (store.state.idToken) {
+          next()
+        } else {
+          next('/login')
+        }
       }
-    }
     },
     {
       path: '/reembolsos',
       name: 'Reembolsos',
-      component: RefundManagement
+      component: RefundManagement,
+      beforeEnter (to, from, next) {
+        if (store.state.idToken) {
+          next()
+        } else {
+          next('/login')
+        }
+      }
+      
     },
     {
       path: '/password/redefinirsenha',
       name: 'RedefinirSenha',
-      component: RedefinirSenha
+      component: RedefinirSenha,
+      beforeEnter (to, from, next) {
+        if (store.state.idToken) {
+          next()
+        } else {
+          next('/login')
+        }
+      }
     },
     {
       path: '/password/novasenha/:id',
@@ -72,7 +108,14 @@ export default new Router({
     {
       path: '/password/message/:email',
       name: 'MessageRedefine',
-      component: MessageRedefine
+      component: MessageRedefine,
+      beforeEnter (to, from, next) {
+        if (store.state.idToken) {
+          next()
+        } else {
+          next('/login')
+        }
+      }
     }
   ]
 })

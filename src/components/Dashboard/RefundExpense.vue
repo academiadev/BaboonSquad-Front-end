@@ -27,13 +27,14 @@
 </template>
 
 <script>
-  import Reembolso from './Reembolso.vue';
+  import Reembolso from './RefundExpenseItem.vue';
   import RefundExpenseGraph from './refundExpenseGraph.vue';
 
   export default {
     name: 'TableCard',
     data() {
       return {
+        title: "Dashboard Gastos",
         reembolsos: [
           {
             id:1,
@@ -77,6 +78,9 @@
     components: {
       appReembolso: Reembolso,
       refundExpenseGraph: RefundExpenseGraph
+    },
+    created () {
+      this.$store.commit('changeTitle', this.title)
     }
   }
 </script>
