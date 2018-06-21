@@ -86,7 +86,6 @@
 </template>
 
 <script>
-  import Password from '../Shared/Password.vue'
   import { validationMixin } from 'vuelidate'
   import {
     required,
@@ -171,7 +170,6 @@
           company: this.form.company,
           typePermission: this.radio
       }
-        console.log(formData)
          this.$store.dispatch('save', formData).then(res => { console.log(res) } ).catch(erro => console.log(error) )
 
       },
@@ -180,14 +178,11 @@
 
         if (!this.$v.$invalid) {
           this.OnSubmit()
-        }else {
+        } else {
             this.sending = false
         }
       }
     },
-  components: {
-    adevpassword: Password
-  }
   }
 </script>
 

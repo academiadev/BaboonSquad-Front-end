@@ -4,21 +4,29 @@
     <form novalidate class="md-layout md-alignment-top-center " @submit.prevent="validatePasswords">
       <md-card class="md-layout-item md-size-30 md-small-size-100">
         <md-card-header class="md-layout md-alignment-center">
-          <div class="md-title">Cadastre uma nova senha</div>
+          <div class="md-title">Cadastre uma nova senha {{ $route.params.id }}</div>
         </md-card-header>
         <md-card-content>
           <div class="md-layout-item md-small-size-100">
-              <adevpassword v-model="form.password" v-on:isValid="validatePassword"></adevpassword>
-          </div>
-          <div class="md-layout-item md-small-size-100">
-            <md-field :class="getValidationClass('confirmPassword')">
-              <label for="password">Confirmar senha</label>
-              <md-input type="password" name="confirmPassword" id="confirmPassword" v-model="form.confirmPassword"
-                        @blur="$v.form.confirmPassword.$touch()" :disabled="sending" />
-              <span class="md-error" v-if="!$v.form.confirmPassword.required">É necesário confirmar a sua senha</span>
-              <span class="md-error" v-else-if="!$v.form.confirmPassword.sameAs">As senha devem ser iguais</span>
+            <md-field :class="getValidationClass('password')">
+              <label for="password">Senha</label>
+              <md-input type="password" name="password" id="password" v-model="form.password" :disabled="sending" />
+              <span class="md-error" v-if="!$v.form.password.required">É necesário preencher uma senha</span>
+              <span class="md-error" v-else-if="!$v.form.password.minLength">A senha deve ter no mínimo 8 caracteres</span>
+              <span class="md-error" v-else-if="!$v.form.password.mustHaveNumber">A senha deve possuir no mínimo um número</span>
+              <span class="md-error" v-else-if="!$v.form.password.mustHaveUpperCase">A senha deve possuir no mínimo uma letra maiúscula</span>
+              <span class="md-error" v-else-if="!$v.form.password.mustHaveSpecialCaractes">A senha deve possuir no mínimo um carácter especial</span>
             </md-field>
           </div>
+            <div class="md-layout-item md-small-size-100">
+              <md-field :class="getValidationClass('confirmPassword')">
+                <label for="password">Confirmar senha</label>
+                <md-input type="password" name="confirmPassword" id="confirmPassword" v-model="form.confirmPassword"
+                          @blur="$v.form.confirmPassword.$touch()" :disabled="sending" />
+                <span class="md-error" v-if="!$v.form.confirmPassword.required">É necesário confirmar a sua senha</span>
+                <span class="md-error" v-else-if="!$v.form.confirmPassword.sameAs">As senha devem ser iguais</span>
+              </md-field>
+            </div>
         </md-card-content>
 
         <md-progress-bar md-mode="indeterminate" v-if="sending" />
@@ -89,12 +97,24 @@
         this.$v.$touch()
 
         if (!this.$v.$invalid) {
-          this.saveUser()
+          this.OnSubmit()
         }
+      },
+      OnSubmit () {
+        this.sending = true
+        const data = {
+          password: this.form.password,
+          code: this.$route.params.id
+      }
+         this.$store.dispatch('redefinePassword', data).then(res => { console.log(res) } ).catch(erro => console.log(error) )
+
       },
     },
     components: {
       adevpassword: Password
+    },
+    created() {
+         this.$store.dispatch('getUsedPassword', this.$route.params.id).then(res => { console.log(res) } ).catch(erro => console.log(error) )
     }
   }
 </script>

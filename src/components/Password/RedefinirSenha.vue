@@ -73,8 +73,7 @@
         const formData = {
           email: this.form.email,
       }
-        console.log(formData)
-        this.$store.dispatch('redefinePassword', formData).then(res => { console.log(res) } ).catch(erro => console.log(error) )
+        this.$store.dispatch('requestRedefinePassword', formData).then(res => { console.log(res) } ).catch(erro => console.log(error) )
 
       },
       clearForm () {

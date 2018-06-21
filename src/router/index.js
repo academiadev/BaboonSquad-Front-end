@@ -7,7 +7,7 @@ import Perfil from '@/components/User/Perfil.vue'
 import Gastos from '@/components/Dashboard/Gastos.vue'
 import RefundManagement from '@/components/Dashboard/RefundManagement.vue'
 import RedefinirSenha from '@/components/password/RedefinirSenha.vue'
-import NovaSenha from '@/components/password/NovaSenha.vue'
+import NewPassword from '@/components/password/NewPassword.vue'
 import MessageRedefine from '@/components/password/MessageRedefine.vue'
 
 
@@ -65,12 +65,12 @@ export default new Router({
       component: RedefinirSenha
     },
     {
-      path: '/password/novasenha',
+      path: '/password/novasenha/:id',
       name: 'NovaSenha',
-      component: NovaSenha
+      component: NewPassword
     },
     {
-      path: '/password/message',
+      path: '/password/message/:email',
       name: 'MessageRedefine',
       component: MessageRedefine
     }
