@@ -5,11 +5,11 @@
       <md-card-header>
         <div class="md-title">E-mail de redefinição de senha enviado!</div>
       </md-card-header>
-
-      <md-card-content>Um link para redefinir sua senha foi enviado para o e-mail {{ email }} </md-card-content>
-      
+      <md-card-content>
+          <p class="mensagem-email">Um link para redefinir sua senha foi enviado para o e-mail: {{ $route.params.email }} </p>
+      </md-card-content>
       <md-card-actions>
-        <md-button to="../">Inicio</md-button>
+        <md-button to="../../login">Inicio</md-button>
       </md-card-actions>
     </md-card>
   </div>
@@ -36,8 +36,13 @@
   }
 
   .md-card-content{
-  	padding-left: 50px;
-  	padding-right: 50px;
-    padding-top: 15px;
+  	padding-left: 20px;
+  	padding-right: 20px;
+    padding-top: 20px;
   }
+
+  .mensagem-email{
+    font-size: 22px;
+  }
+
 </style>

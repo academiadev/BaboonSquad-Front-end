@@ -67,7 +67,6 @@
               </md-field>
             </div>
           <div>    
-
           </div>
         </md-card-content>
 
@@ -78,7 +77,9 @@
         </md-card-actions>
 
 
-      <md-snackbar :md-active.sync="userSaved">{{ lastUser }}, seu cadastro foi efetuado com sucesso!</md-snackbar>
+      <md-snackbar :md-active.sync="userSaved">Cadastro foi efetuado com sucesso!</md-snackbar>
+      <md-snackbar :md-active.sync="errorSaved">{{ error }}</md-snackbar>
+      
       </md-card>
     </form>
     <md-empty-state></md-empty-state>
@@ -86,7 +87,6 @@
 </template>
 
 <script>
-  import Password from '../Shared/Password.vue'
   import { validationMixin } from 'vuelidate'
   import {
     required,
@@ -113,7 +113,8 @@
       radio: 1,
       userSaved: false,
       sending: false,
-      lastUser: null
+      lastUser: null,
+      errorSaved: false
     }),
     validations: {
       form: {
@@ -144,6 +145,11 @@
         }
       }
     },
+    computed: {
+      error () {
+        return this.$store.getters.erro != null ? this.$store.getters.erro.message : null ;
+      }
+    },
     methods: {
       getValidationClass (fieldName) {
         const field = this.$v.form[fieldName]
@@ -171,23 +177,25 @@
           company: this.form.company,
           typePermission: this.radio
       }
-        console.log(formData)
-         this.$store.dispatch('save', formData).then(res => { console.log(res) } ).catch(erro => console.log(error) )
-
+         this.$store.dispatch('save', formData).then(res => { 
+            this.userSaved = true
+          })
+         .catch(erro => 
+            console.log(erro),
+            this.sending = false,
+            this.errorSaved = true
+         )
       },
       validateUser () {
         this.$v.$touch()
 
         if (!this.$v.$invalid) {
           this.OnSubmit()
-        }else {
+        } else {
             this.sending = false
         }
       }
     },
-  components: {
-    adevpassword: Password
-  }
   }
 </script>
 

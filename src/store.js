@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import axios from './axios-auth'
 
 import router from './router/index'
+import { resolve } from 'path';
 
 Vue.use(Vuex)
 
@@ -17,8 +18,9 @@ export default new Vuex.Store({
     isAdmin: false,
     refundCategory: ["Outros", "Hospedagem", "Transporte", "Alimentação"],
     refundsExpenseGraph: [],
+    erro: null,
+    redefinePassword: false
   },
-
   mutations: {
     authUser(state, userData) {
       state.idToken = userData.token
@@ -50,6 +52,9 @@ export default new Vuex.Store({
     setRefunds(state, data) {
       state.refundsExpenseGraph = data;
     },
+    clearErroData(state){
+      state.erro = null;
+    }
   },
 
   actions: {
@@ -58,8 +63,18 @@ export default new Vuex.Store({
         commit('clearAuthData')
       }, expirationTime * 1000)
     },
-    save(state, form) {
-      axios.post('pessoa/gravar', {
+    setError({commit}, error){
+      this.state.erro = error
+    },
+    setRedefinePassword({commit}, redefinePassword){
+      this.state.redefinePassword = redefinePassword,
+      console.log(this.state.redefinePassword);
+
+    },
+    save({commit, dispatch}, form){
+      commit('clearErroData'),
+      commit('clearErroData'),
+      axios.post('pessoa/gravar',{
         name: form.name,
         email: form.email,
         password: form.password,
@@ -71,38 +86,80 @@ export default new Vuex.Store({
           dispatch('login', {email: form.email, password: form.password, returnSecureToken: true } )
           this.$route.replace("/reembolsos")
         })
+        .catch(
+          error => 
+          dispatch('setError',error.response.data)
+        )
 
-        .catch(error => console.log(error))
+    },
+    alter({commit, dispatch}, form){
+      console.log(this.state.email+1)
+      commit('clearAuthData'),
+      commit('clearErroData'),
+      axios.post('pessoa/alterar',{
+        name: form.name,
+        newEmail: form.newEmail,
+        email: form.email
+      })
+        .then(res => {
+          console.log(this.state.email)
+        })
+        .catch(
+          error =>{ 
+          dispatch('setError',error)
+        })
     },
     login({ commit, dispatch }, authData) {
+      commit('clearErroData'),
       axios.post('auth/login', {
         email: authData.email,
         password: authData.password,
         returnSecureToken: true
       })
         .then(res => {
-          console.log(res)
           const now = new Date()
           const expirationDate = new Date(now.getTime() + res.data.expires_in * 1000)
           localStorage.setItem('token', res.data.access_token)
           localStorage.setItem('expirationDate', expirationDate)
           commit('authUser', {
-            token: res.data.idToken,
+            token: res.data.access_token,
+            userId: res.data.localId
           })
           dispatch('setLogoutTimer', res.data.expiresIn)
-          router.replace('/')
+          router.replace('/');
         })
-        .catch(error => console.log(error))
+        .catch(
+          error =>{ 
+          console.log(error.response.data)
+          if(error.response.data.status == 500){
+            error.response.data.message = "Usuário ou Senha incorretas"
+          }
+          dispatch('setError',error.response.data)
+        })
     },
-    redefinePassword({ commit, dispatch }, form) {
+    requestRedefinePassword({commit, dispatch}, form){
       axios.post('/password/request', {
         email: form.email,
-      }).then(res => {
-        console.log(res)
-
+      }).then(res =>{
+        router.replace('/password/message/'+form.email)
       })
-        .catch(error => console.log(error))
-      router.replace('/password/message')
+      .catch(error => console.log(error))
+    },
+    redefinePassword({commit, dispatch}, data){
+      axios.post('/password/alter', {
+        newPassword: data.password,
+        code: data.code
+      }).then(res =>{
+        console.log(res)
+      })
+      .catch(error => console.log(error))
+    },
+    getUsedPassword({commit, dispatch}, code){
+      axios.get('/password/new/' + code).then(res =>{
+        console.log(res),
+        dispatch('setRedefinePassword', res.data)
+      })
+      .catch(error => console.log(error))
     },
     tryAutoLogin({ commit }) {
       const token = localStorage.getItem('token')
@@ -165,6 +222,12 @@ export default new Vuex.Store({
     },
     refundsExpenseGraph(state) {
       return state.refundsExpenseGraph
+    },
+    erro(state){
+      return state.erro
+    },
+    redefinePassword(state){
+      return state.redefinePassword
     }
   }
 })

@@ -6,24 +6,38 @@
         <md-card-header class="md-layout md-alignment-center">
           <div class="md-title">Cadastre uma nova senha</div>
         </md-card-header>
-        <md-card-content>
+        <md-card-content v-if="!redefinePassword">
+          <p class="already-accessed"> Esta url já foi acessado </p>
+          <md-card-actions>
+            <md-button to="../../login">Inicio</md-button>
+          </md-card-actions>
+        </md-card-content>   
+        <md-card-content v-if="redefinePassword">
           <div class="md-layout-item md-small-size-100">
-              <adevpassword v-model="form.password" v-on:isValid="validatePassword"></adevpassword>
-          </div>
-          <div class="md-layout-item md-small-size-100">
-            <md-field :class="getValidationClass('confirmPassword')">
-              <label for="password">Confirmar senha</label>
-              <md-input type="password" name="confirmPassword" id="confirmPassword" v-model="form.confirmPassword"
-                        @blur="$v.form.confirmPassword.$touch()" :disabled="sending" />
-              <span class="md-error" v-if="!$v.form.confirmPassword.required">É necesário confirmar a sua senha</span>
-              <span class="md-error" v-else-if="!$v.form.confirmPassword.sameAs">As senha devem ser iguais</span>
+            <md-field :class="getValidationClass('password')">
+              <label for="password">Senha</label>
+              <md-input type="password" name="password" id="password" v-model="form.password" :disabled="sending" />
+              <span class="md-error" v-if="!$v.form.password.required">É necesário preencher uma senha</span>
+              <span class="md-error" v-else-if="!$v.form.password.minLength">A senha deve ter no mínimo 8 caracteres</span>
+              <span class="md-error" v-else-if="!$v.form.password.mustHaveNumber">A senha deve possuir no mínimo um número</span>
+              <span class="md-error" v-else-if="!$v.form.password.mustHaveUpperCase">A senha deve possuir no mínimo uma letra maiúscula</span>
+              <span class="md-error" v-else-if="!$v.form.password.mustHaveSpecialCaractes">A senha deve possuir no mínimo um carácter especial</span>
             </md-field>
           </div>
+            <div class="md-layout-item md-small-size-100">
+              <md-field :class="getValidationClass('confirmPassword')">
+                <label for="password">Confirmar senha</label>
+                <md-input type="password" name="confirmPassword" id="confirmPassword" v-model="form.confirmPassword"
+                          @blur="$v.form.confirmPassword.$touch()" :disabled="sending" />
+                <span class="md-error" v-if="!$v.form.confirmPassword.required">É necesário confirmar a sua senha</span>
+                <span class="md-error" v-else-if="!$v.form.confirmPassword.sameAs">As senha devem ser iguais</span>
+              </md-field>
+            </div>
         </md-card-content>
-
+        
         <md-progress-bar md-mode="indeterminate" v-if="sending" />
 
-        <md-card-actions>
+        <md-card-actions v-show="redefinePassword">
           <md-button type="submit"  class="md-dense md-raised md-primary" :disabled="sending">Confirmar nova senha</md-button>
         </md-card-actions>
 
@@ -67,6 +81,11 @@
         }
       }
     },
+    computed: {
+      redefinePassword () {
+        return this.$store.getters.redefinePassword
+      }
+    },     
     methods: {
       getValidationClass (fieldName) {
         const field = this.$v.form[fieldName]
@@ -89,12 +108,24 @@
         this.$v.$touch()
 
         if (!this.$v.$invalid) {
-          this.saveUser()
+          this.OnSubmit()
         }
+      },
+      OnSubmit () {
+        this.sending = true
+        const data = {
+          password: this.form.password,
+          code: this.$route.params.id
+      }
+         this.$store.dispatch('redefinePassword', data).then(res => { console.log(res) } ).catch(erro => console.log(error) )
+
       },
     },
     components: {
       adevpassword: Password
+    },
+    created() {
+         this.$store.dispatch('getUsedPassword', this.$route.params.id).then(res => { console.log(res) } ).catch(erro => console.log(error) )
     }
   }
 </script>
@@ -132,6 +163,9 @@
 
   .md-card-actions {
   	padding-bottom: 15px;
+  }
+  .already-accessed{
+    font-size: 20px;
   }
 
 </style>

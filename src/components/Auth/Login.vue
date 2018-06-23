@@ -12,16 +12,14 @@
           <md-field :class="getValidationClass('email')">
             <label for="email">Email</label>
             <md-input type="email" name="email" id="email" autocomplete="email" v-model="form.email" :disabled="sending" />
-            <span class="md-error" v-if="!$v.form.email.required">The email is required</span>
-            <span class="md-error" v-else-if="!$v.form.email.email">Invalid email</span>
+            <span class="md-error" v-if="!$v.form.email.required">É necesário preencher o email</span>
           </md-field>
 
           <div class="md-layout-item md-small-size-100">
             <md-field :class="getValidationClass('password')">
               <label for="password">Password</label>
               <md-input type="password" name="password" id="password" v-model="form.password" :disabled="sending" />
-              <span class="md-error" v-if="!$v.form.password.required">The password is required</span>
-              <span class="md-error" v-else-if="!$v.form.password.minlength">Invalid password</span>
+              <span class="md-error" v-if="!$v.form.password.required">É necesário preencher uma senha</span>
             </md-field>
           </div>
         </md-card-content>
@@ -35,6 +33,9 @@
           <md-button to="../password/redefinirsenha">ESQUECI MINHA SENHA</md-button>
           <md-button to="./cadastro">QUERO ME CADASTRAR </md-button>
         </div>
+
+        <md-snackbar :md-active.sync="errorSaved">{{ error }}</md-snackbar>
+
       </md-card>
     </form>
   </div>
@@ -59,7 +60,8 @@
       },
       userSaved: false,
       sending: false,
-      lastUser: null
+      lastUser: null,
+      errorSaved: false
     }),
     validations: {
       form: {
@@ -71,6 +73,11 @@
           required,
           minLength: minLength(3)
         }
+      }
+    },
+    computed: {
+      error () {
+        return this.$store.getters.erro != null ? this.$store.getters.erro.message : null ;
       }
     },
     methods: {
@@ -91,8 +98,11 @@
       saveUser () {
         this.sending = true
         this.$store.dispatch('login', {email: this.form.email, password: this.form.password})
-          this.userSaved = true
+        .catch(erro => 
+          console.logn(erro),
+          this.errorSaved = true,
           this.sending = false
+        )
       },
       validateUser () {
         this.$v.$touch()
@@ -132,6 +142,10 @@
 .md-card-actions {
 	padding-left: 50px;
 	padding-right: 50px;
+}
+
+.md-layout{
+  padding-left: 60px;
 }
 //!Global
 </style>
