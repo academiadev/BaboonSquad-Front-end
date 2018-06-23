@@ -100,7 +100,7 @@
         this.$store.dispatch('login', {email: this.form.email, password: this.form.password})
         .catch(erro => 
           console.logn(erro),
-          this.errorSaved = true,
+          erro != null ? this.errorSaved = true : null,
           this.sending = false
         )
       },

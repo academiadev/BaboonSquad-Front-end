@@ -86,7 +86,6 @@ export default new Router({
           next('/login')
         }
       }
-      
     },
     {
       path: '/password/redefinirsenha',
@@ -97,6 +96,19 @@ export default new Router({
       path: '/password/novasenha/:id',
       name: 'NovaSenha',
       component: NewPassword
+    },
+    {
+      path: '/password/novasenha/',
+      name: 'NovaSenha',
+      component: NewPassword,
+      beforeEnter (to, from, next) {
+        if (store.state.idToken) {
+          next()
+        } else {
+          next('/')
+        }
+      }
+      
     },
     {
       path: '/password/message/:email',
