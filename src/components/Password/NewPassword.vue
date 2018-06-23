@@ -4,9 +4,15 @@
     <form novalidate class="md-layout md-alignment-top-center " @submit.prevent="validatePasswords">
       <md-card class="md-layout-item md-size-30 md-small-size-100">
         <md-card-header class="md-layout md-alignment-center">
-          <div class="md-title">Cadastre uma nova senha {{ $route.params.id }}</div>
+          <div class="md-title">Cadastre uma nova senha</div>
         </md-card-header>
-        <md-card-content>
+        <md-card-content v-if="!redefinePassword">
+          <p class="already-accessed"> Esta url já foi acessado </p>
+          <md-card-actions>
+            <md-button to="../../login">Inicio</md-button>
+          </md-card-actions>
+        </md-card-content>   
+        <md-card-content v-if="redefinePassword">
           <div class="md-layout-item md-small-size-100">
             <md-field :class="getValidationClass('password')">
               <label for="password">Senha</label>
@@ -28,10 +34,10 @@
               </md-field>
             </div>
         </md-card-content>
-
+        
         <md-progress-bar md-mode="indeterminate" v-if="sending" />
 
-        <md-card-actions>
+        <md-card-actions v-show="redefinePassword">
           <md-button type="submit"  class="md-dense md-raised md-primary" :disabled="sending">Confirmar nova senha</md-button>
         </md-card-actions>
 
@@ -75,6 +81,11 @@
         }
       }
     },
+    computed: {
+      redefinePassword () {
+        return this.$store.getters.redefinePassword
+      }
+    },     
     methods: {
       getValidationClass (fieldName) {
         const field = this.$v.form[fieldName]
@@ -152,6 +163,9 @@
 
   .md-card-actions {
   	padding-bottom: 15px;
+  }
+  .already-accessed{
+    font-size: 20px;
   }
 
 </style>

@@ -9,7 +9,7 @@
           <p class="mensagem-email">Um link para redefinir sua senha foi enviado para o e-mail: {{ $route.params.email }} </p>
       </md-card-content>
       <md-card-actions>
-        <md-button to="../">Inicio</md-button>
+        <md-button to="../../login">Inicio</md-button>
       </md-card-actions>
     </md-card>
   </div>

@@ -91,14 +91,7 @@ export default new Router({
     {
       path: '/password/redefinirsenha',
       name: 'RedefinirSenha',
-      component: RedefinirSenha,
-      beforeEnter (to, from, next) {
-        if (store.state.idToken) {
-          next()
-        } else {
-          next('/login')
-        }
-      }
+      component: RedefinirSenha
     },
     {
       path: '/password/novasenha/:id',
@@ -109,13 +102,6 @@ export default new Router({
       path: '/password/message/:email',
       name: 'MessageRedefine',
       component: MessageRedefine,
-      beforeEnter (to, from, next) {
-        if (store.state.idToken) {
-          next()
-        } else {
-          next('/login')
-        }
-      }
     }
   ]
 })

@@ -85,6 +85,25 @@
         this.form.name = null
         this.form.email = null
       },
+      OnSubmit () {
+        window.setTimeout(() => {
+          this.sending = false
+          this.clearForm()
+        }, 1500)
+        this.sending = true
+        const formData = {
+          name: this.form.name,
+          newEmail: this.form.email,
+          email: this.$store.getters.email
+        }
+         this.$store.dispatch('alter', formData).then(res => { 
+            this.userSaved = true
+          })
+         .catch(erro => 
+            console.log(erro),
+            this.sending = false
+          )
+      },
       saveUser () {
         this.sending = true
 
@@ -100,7 +119,7 @@
         this.$v.$touch()
 
         if (!this.$v.$invalid) {
-          this.saveUser()
+          this.OnSubmit()
         }
       }
     },

@@ -18,8 +18,9 @@ export default new Vuex.Store({
     isAdmin: false,
     refundCategory: ["Outros", "Hospedagem", "Transporte", "Alimentação"],
     refundsExpenseGraph: [],
+    erro: null,
+    redefinePassword: false
   },
-
   mutations: {
     authUser(state, userData) {
       state.idToken = userData.token
@@ -29,9 +30,9 @@ export default new Vuex.Store({
       var payload = JSON.parse(window.atob(base64));
 
       state.user = payload.name,
-        state.email = payload.email,
-        state.company = payload.company,
-        state.isAdmin = payload.isAdmin
+      state.email = payload.email,
+      state.company = payload.company,
+      state.isAdmin = payload.isAdmin
     },
     changeTitle(state, title) {
       state.title = title
@@ -39,13 +40,16 @@ export default new Vuex.Store({
     clearAuthData(state) {
       state.idToken = null;
       state.user = null;
-      emai = null;
-      company = null;
-      isAdmin = false;
+      state.email = null;
+      state.company = null;
+      state.isAdmin = false;
     },
     setRefunds(state, data) {
       state.refundsExpenseGraph = data;
     },
+    clearErroData(state){
+      state.erro = null;
+    }
   },
 
   actions: {
@@ -54,7 +58,17 @@ export default new Vuex.Store({
         commit('clearAuthData')
       }, expirationTime * 1000)
     },
+    setError({commit}, error){
+      this.state.erro = error
+    },
+    setRedefinePassword({commit}, redefinePassword){
+      this.state.redefinePassword = redefinePassword,
+      console.log(this.state.redefinePassword);
+
+    },
     save({commit, dispatch}, form){
+      commit('clearErroData'),
+      commit('clearErroData'),
       axios.post('pessoa/gravar',{
         name: form.name,
         email: form.email,
@@ -63,15 +77,36 @@ export default new Vuex.Store({
         company: form.company
       })
         .then(res => {
-          console.log(res)
+          router.replace('/');
         })
+        .catch(
+          error => 
+          dispatch('setError',error.response.data)
+        )
 
-        .catch(error => console.log(error))
+    },
+    alter({commit, dispatch}, form){
+      console.log(this.state.email+1)
+      commit('clearAuthData'),
+      commit('clearErroData'),
+      axios.post('pessoa/alterar',{
+        name: form.name,
+        newEmail: form.newEmail,
+        email: form.email
+      })
+        .then(res => {
+          console.log(this.state.email)
+        })
+        .catch(
+          error =>{ 
+          dispatch('setError',error)
+        })
     },
     getRefundByUser() {
       axios.get('reembolso/')
     },
     login({ commit, dispatch }, authData) {
+      commit('clearErroData'),
       axios.post('auth/login', {
         email: authData.email,
         password: authData.password,
@@ -89,7 +124,14 @@ export default new Vuex.Store({
           dispatch('setLogoutTimer', res.data.expiresIn)
           router.replace('/');
         })
-        .catch(error => console.log(error))
+        .catch(
+          error =>{ 
+          console.log(error.response.data)
+          if(error.response.data.status == 500){
+            error.response.data.message = "Usuário ou Senha incorretas"
+          }
+          dispatch('setError',error.response.data)
+        })
     },
     requestRedefinePassword({commit, dispatch}, form){
       axios.post('/password/request', {
@@ -100,8 +142,6 @@ export default new Vuex.Store({
       .catch(error => console.log(error))
     },
     redefinePassword({commit, dispatch}, data){
-      console.log('Password: '+ data.password);
-      console.log('Code: '+ data.code);
       axios.post('/password/alter', {
         newPassword: data.password,
         code: data.code
@@ -112,8 +152,8 @@ export default new Vuex.Store({
     },
     getUsedPassword({commit, dispatch}, code){
       axios.get('/password/new/' + code).then(res =>{
-        console.log(res)
-
+        console.log(res),
+        dispatch('setRedefinePassword', res.data)
       })
       .catch(error => console.log(error))
     },
@@ -175,6 +215,12 @@ export default new Vuex.Store({
     },
     refundsExpenseGraph(state) {
       return state.refundsExpenseGraph
+    },
+    erro(state){
+      return state.erro
+    },
+    redefinePassword(state){
+      return state.redefinePassword
     }
   }
 })
