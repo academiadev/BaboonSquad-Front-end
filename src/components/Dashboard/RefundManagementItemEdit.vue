@@ -14,7 +14,7 @@
               <label for="name">Nome do reembolso</label>
               <md-input name="name" id="name" autocomplete="given-name" v-model="form.name" :disabled="sending" />
               <span class="md-error" v-if="!$v.form.name.required">É necesario nomear o reembolso</span>
-              <span class="md-error" v-else-if="!$v.form.name.minlength">O nome do reembolso deve possuir mais de {{ $v.name.$params.minLength }} letras</span>
+              <span class="md-error" v-else-if="!$v.form.name.minlength">O nome do reembolso deve possuir mais de {{ $v.form.name.$params.minLength.min }} letras</span>
             </md-field>
           
 
@@ -22,27 +22,27 @@
           <md-field  :class="getValidationClass('type')">
             <label for="type">Categoria</label>
             <md-select v-model="form.type"  name="type" id="type">
-              <md-option value="">Escolha</md-option>
-              <md-option value="0">Outros</md-option>
-              <md-option value="1">Hospedagem</md-option>
-              <md-option value="2">Transposte</md-option>
-              <md-option value="3">Alimentação</md-option>
+              <md-option value=null>Escolha</md-option>
+              <md-option value=0>Outros</md-option>
+              <md-option value=1>Hospedagem</md-option>
+              <md-option value=2>Transposte</md-option>
+              <md-option value=3>Alimentação</md-option>
             </md-select>
             <span class="md-error">O reembolso deve possuir uma categoria</span>
           </md-field>
           
-          <md-datepicker :class="getValidationClass('date')" v-model="form.date" md-immediately />
+          <md-datepicker :class="getValidationClass('date')" id="date" v-model="form.date" md-immediately/>
         
           <md-field :class="getValidationClass('value')">
             <label for="value">Valor</label>
-            <md-input type="number" id="value" name="value" v-model="form.value" :disabled="sending" />
+            <md-input type="money" id="value" name="value" v-money="money" v-model="form.value" :disabled="sending" />
             <span class="md-error" v-if="!$v.form.value.required">Informe o valor do reembolso</span>
             <span class="md-error" v-else-if="!$v.form.value.numeric">Informe um valor válido para o reembolso</span>
             <span class="md-error" v-else-if="!$v.form.value.minValue">Informe um valor maior que zero para o reembolso</span>
           </md-field>
         
         
-          <md-field :class="getValidationClass('file')" id="file">
+          <md-field>
             <label>Anexo</label>
             <md-file/>
           </md-field>
@@ -51,8 +51,8 @@
         <md-progress-bar md-mode="indeterminate" v-if="sending" />
 
         <md-card-actions>
-          <md-button type="submit" :disabled="sending">EDITAR</md-button>
-          <md-button type="reset" class="md-primary" :disabled="sending">FECHAR</md-button>
+          <md-button type="reset" @click="Close"  :disabled="sending">FECHAR</md-button>
+          <md-button type="submit" class="md-primary" :disabled="sending">EDITAR</md-button>
         </md-card-actions>
       </md-card>
 
@@ -62,7 +62,17 @@
 </template>
 
 <script>
+  function formatDate(date){
+    function pad(s) { return (s < 10) ? '0' + s : s; }
+    var formatDate = new  Date(date);
+    return [pad(formatDate.getDate()), pad(formatDate.getMonth()+1), formatDate.getFullYear()].join('/');
+  }
+  function formatValue(value){
+    return value.replace(/\./g, "").replace("R$ ", "").replace("-", "").replace(",",".");
+  }
+
   import { validationMixin } from 'vuelidate'
+  import axios from '@/axios-auth'
   import {
     required,
     numeric,
@@ -75,14 +85,26 @@
     name: 'DadosReembolso',
     mixins: [validationMixin],
     data: () => ({
+      money: {
+          decimal: ',',
+          thousands: '.',
+          prefix: 'R$ ',
+          suffix: '',
+          precision: 2,
+          masked: true
+        },
       form: {
+        id: null,
+        status: null,
         name: null,
         type: null,
-        date: null,
-        value: null,
+        date: new Date("01/01/2018"),
+        value: 0,
         file: null,
+        user: null,
+        company: null
       },
-      //selectedDate: new Date('2018/03/26'),
+      selecedDate: new Date("01/01/2010"),
       userSaved: false,
       sending: false,
       lastUser: null
@@ -100,16 +122,19 @@
           required
         },
         value: {
-          required,
-          numeric,
-          vinValue: minValue(0.01)
-        },
-        file: {
           required
         }
       }
     },
-    methods: {
+    computed: {
+      company () {
+        return this.$store.getters.company 
+      },
+      email () {
+        return this.$store.getters.email 
+      }
+    },
+    methods: { 
       getValidationClass (fieldName) {
         const field = this.$v.form[fieldName]
 
@@ -121,28 +146,65 @@
       },
       clearForm () {
         this.$v.$reset()
+        this.form.id = null
         this.form.name = null
         this.form.type = null
         this.form.date = null
-        this.form.value = null
+        this.form.value = 0
         this.form.file = null
       },
       saveRefund () {
         this.sending = true
+        if (this.form.id) {
+          this.putRefund()
+        }else{
+          this.postRefund()  
+        }
+      },
+      postRefund(){
         const formData = {
           name: this.form.name,
-          email: this.form.email,
-          password: this.form.password,
-          confirmPassword: this.form.confirmPassword,
-          company: this.form.company
+          category: Number(this.form.type),
+          status:  2,
+          date: formatDate(this.form.date),
+          value: formatValue(this.form.value),
+          userName: this.email,
+          company: this.company
         }
         console.log(formData)
+        axios.post( 'reembolso/', formData)
+          .then(res => { console.log(res)
+            this.$router.push('/reembolsos')})
+          .catch(error => console.log(error));
+      },
+      putRefund(){
+        const formData = {
+          id: this.form.id,
+          name: this.form.name,
+          category: this.form.type,
+          status: this.form.status,
+          date: formatDate(this.form.date),
+          value: formatValue(this.form.value),
+          userName: this.email,
+          company: this.company
+          }
+        console.log(formData)
+        axios.put( 'reembolso/:this.form.id', { formData })
+          .then(res => { console.log(res)
+            this.$router.push('/reembolsos')})
+          .catch(error => console.log(error));
+      },
+      OnSubmit () {
+         this.saveRefund()
+      },
+      Close () {
+        this.$emit("CloseRefundEdit");
       },
       validateRefund () {
         this.$v.$touch()
 
         if (!this.$v.$invalid) {
-          this.saveUser()
+          this.saveRefund()
         }
       }
     }
