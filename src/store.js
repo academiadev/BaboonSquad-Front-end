@@ -178,16 +178,11 @@ export default new Vuex.Store({
       router.replace('/login')
     },
     getRefundExpense({ commit, state }) {
-      console.log('aa', 'Bearer ' + state.idToken);
       var config = {
         headers: { 'Authorization': 'Bearer ' + state.idToken }
       };
       axios.get('/reembolso/listaReembolsosCategoria/', config)
-        .then(res => {
-          console.log(res);
-          //ver o que veio de retorno e passar pro setRefounds atualizar o grafico
-          commit('setRefunds', res)
-        })
+        .then(res => commit('setRefunds', res.data))
         .catch(error => console.error(error))
     }
   },
@@ -197,6 +192,9 @@ export default new Vuex.Store({
     },
     email(state) {
       return state.email
+    },
+    token(state) {
+      return state.idToken;
     },
     company(state) {
       return state.company
