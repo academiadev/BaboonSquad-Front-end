@@ -80,12 +80,11 @@ export default new Router({
       name: 'Reembolsos',
       component: RefundManagement,
       beforeEnter (to, from, next) {
-        next()
-        // if (store.state.idToken) {
-        //   next()
-        // } else {
-        //   next('/login')
-        // }
+        if (store.state.idToken) {
+          next()
+        } else {
+          next('/login')
+        }
       }
       
     },
