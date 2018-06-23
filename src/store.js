@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from './axios-auth'
-import globalAxios from 'axios'
 
 import router from './router/index'
 import { resolve } from 'path';
@@ -13,6 +12,7 @@ export default new Vuex.Store({
     title: "ReembolsoAzul",
     idToken: null,
     user: null,
+    userId: null,
     email: null,
     company: null,
     isAdmin: false,
@@ -25,12 +25,15 @@ export default new Vuex.Store({
     authUser(state, userData) {
       state.idToken = userData.token
 
+      axios.defaults.headers.common['Authorization'] = 'Bearer '+ state.idToken;
+
       var base64Url = state.idToken.split('.')[1];
       var base64 = base64Url.replace('-', '+').replace('_', '/');
       var payload = JSON.parse(window.atob(base64));
 
-      state.user = payload.name,
-      state.email = payload.email,
+      state.user = payload.user,
+      state.userId = payload.userId,
+      state.email = payload.sub,
       state.company = payload.company,
       state.isAdmin = payload.isAdmin
     },
@@ -40,9 +43,11 @@ export default new Vuex.Store({
     clearAuthData(state) {
       state.idToken = null;
       state.user = null;
-      state.email = null;
+      state.userId = null;
+      state.emai = null;
       state.company = null;
       state.isAdmin = false;
+      axios.defaults.headers.common['Authorization'] = '';
     },
     setRefunds(state, data) {
       state.refundsExpenseGraph = data;
@@ -77,7 +82,9 @@ export default new Vuex.Store({
         company: form.company
       })
         .then(res => {
-          router.replace('/');
+          console.log(res)
+          dispatch('login', {email: form.email, password: form.password, returnSecureToken: true } )
+          this.$route.replace("/reembolsos")
         })
         .catch(
           error => 
@@ -112,9 +119,6 @@ export default new Vuex.Store({
           error =>{ 
           dispatch('setError',error)
         })
-    },
-    getRefundByUser() {
-      axios.get('reembolso/')
     },
     login({ commit, dispatch }, authData) {
       commit('clearErroData'),
@@ -189,19 +193,14 @@ export default new Vuex.Store({
       commit('clearAuthData')
       localStorage.removeItem('expirationDate')
       localStorage.removeItem('token')
-      router.replace('/login')
+      router.push('/login')
     },
     getRefundExpense({ commit, state }) {
-      console.log('aa', 'Bearer ' + state.idToken);
       var config = {
         headers: { 'Authorization': 'Bearer ' + state.idToken }
       };
       axios.get('/reembolso/listaReembolsosCategoria/', config)
-        .then(res => {
-          console.log(res);
-          //ver o que veio de retorno e passar pro setRefounds atualizar o grafico
-          commit('setRefunds', res)
-        })
+        .then(res => commit('setRefunds', res.data))
         .catch(error => console.error(error))
     }
   },
@@ -209,8 +208,14 @@ export default new Vuex.Store({
     user(state) {
       return state.user
     },
+    userId(state) {
+      return state.userId
+    },
     email(state) {
       return state.email
+    },
+    token(state) {
+      return state.idToken;
     },
     company(state) {
       return state.company

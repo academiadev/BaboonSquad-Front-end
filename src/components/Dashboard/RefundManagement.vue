@@ -28,7 +28,12 @@
             </md-field>
           </md-table-toolbar>
 
-          <md-table-empty-state
+          <md-table-empty-state v-if="emptyTable"
+            md-label="Nenhum reembolso cadastrado"
+            :md-description="`Cadastre um novo reembolso no botão abaixo.`">
+            <md-button class="md-primary md-raised" @click="showDialog = true">Novo Reembolso</md-button>
+          </md-table-empty-state>
+          <md-table-empty-state v-else
             md-label="Nenhum reembolso foi encontrado"
             :md-description="`Não encontramos nenhum reembolso que contenha no nome '${search}'. 
                               Tente procurar por um nome diferente ou então crie um novo reembolso.`">
@@ -53,7 +58,7 @@
             <md-table-cell
               md-label="Valor"
               md-sort-by="value"
-              >{{item.value}}
+              >R$  {{item.value}}
             </md-table-cell>
             <md-table-cell
               md-label="Categoria"
@@ -63,19 +68,20 @@
             </md-table-cell>
             <md-table-cell
               md-label="Usuário"
-              md-sort-by="user"
-              >{{item.user}}
+              md-sort-by="name"
+              v-if="isAdmin" 
+              >{{item.name}}
             </md-table-cell>
           </md-table-row>
         </md-table>
       </div>
     </div>
-    <md-button v-if="!isAdmin" class="md-fab md-primary botao-reembolso" @click="showDialog = true">
+    <md-button v-if="isAdmin" class="md-fab md-primary botao-reembolso" @click="showDialog = true">
       <md-icon >add</md-icon>      
     </md-button>
 
     <md-dialog :md-active.sync="showDialog">
-      <refund-edit :refund="selected[0]"></refund-edit>
+      <refund-edit :refund="selected[0]" @CloseRefundEdit="showDialog = false"></refund-edit>
     </md-dialog>
     
   </div>
@@ -93,6 +99,7 @@
 
     return items
   }
+  import axios from '@/axios-auth'; 
   import Status from './RefundStatus.vue';
   import Category from './RefundCategory.vue';
   import RefundManagementItemEdit from './RefundManagementItemEdit.vue';
@@ -101,14 +108,11 @@
       return {
       name: "Reembolso ContaAzul",  
       showDialog: false,
+      usersId : null,
       search: null,
       searched: [],
       selected: [],
-      refunds: [
-            { id:1, name: "Testanildo", status:1, value: 55, category: 1, date: "13/04/2018", user: "rr"},
-            { id:2, name: "Testando", status:0, value: 87, category: 3, date: "20/07/2018", user: "rr"},
-            { id:3, name: "Money", status: 2, value:66.6, category: 0, date: "26/03/2018", user: "pancho"}
-                ]
+      refunds: []
             }
            
     },
@@ -120,8 +124,18 @@
         if (this.search.trim()){
           this.searched = searchByName(this.refunds, this.search)  
         }else{
-          this.searched = this.refunds
+          this.searched = this.refunds  
         }
+      },
+      getRefundsByUser() {
+        axios.get('/reembolso/usuario/'+ this.usersId)
+        .then(res => {console.log(res.data) 
+              this.refunds = [];
+              res.data.forEach(element => {
+                this.refunds.push(element);
+              });
+              this.searched = this.refunds})
+        .catch(error => console.log(error));
       }
     },
     computed: {
@@ -131,8 +145,17 @@
       auth () {
         return this.$store.getters.isAuthenticated
       },
+      userId () {
+        return this.$store.getters.userId
+      },
       category( ) {
         return this.$store.getters.refundCategory
+      },
+      emptyTable() {
+        if(this.refunds == []){
+          return true
+        }
+        return false
       }
     },
     components: {
@@ -142,7 +165,10 @@
     },
     created () {
       this.$store.commit('changeTitle', this.name)
+      this.usersId = this.$store.getters.userId
+      this.getRefundsByUser()
       this.searched = this.refunds
+      
     }
   }
 </script>

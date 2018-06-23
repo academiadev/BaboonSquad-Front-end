@@ -29,7 +29,7 @@
         <md-card-actions>
           <md-button type="submit"  class="md-dense md-raised md-primary" :disabled="sending">Login</md-button>
         </md-card-actions>
-        <div class="md-layout">
+        <div class="md-layout md-alignment-top-center">
           <md-button to="../password/redefinirsenha">ESQUECI MINHA SENHA</md-button>
           <md-button to="./cadastro">QUERO ME CADASTRAR </md-button>
         </div>
