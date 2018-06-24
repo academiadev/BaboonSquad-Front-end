@@ -30,7 +30,7 @@ export default new Vuex.Store({
       var base64Url = state.idToken.split('.')[1];
       var base64 = base64Url.replace('-', '+').replace('_', '/');
       var payload = JSON.parse(window.atob(base64));
-
+      console.log(payload)
       state.user = payload.user,
       state.userId = payload.userId,
       state.email = payload.sub,
@@ -105,11 +105,11 @@ export default new Vuex.Store({
           const expirationDate = new Date(now.getTime() + res.data.expires_in * 1000)
           localStorage.setItem('token', res.data.access_token)
           localStorage.setItem('expirationDate', expirationDate)
+          console.log(1)
           commit('authUser', {
             token: res.data.access_token,
             userId: res.data.localId
           })
-          console.log(111111)
 
           dispatch('setLogoutTimer', res.data.expiresIn)
 
@@ -128,6 +128,7 @@ export default new Vuex.Store({
         returnSecureToken: true
       })
         .then(res => {
+          console.log(res)
           const now = new Date()
           const expirationDate = new Date(now.getTime() + res.data.expires_in * 1000)
           localStorage.setItem('token', res.data.access_token)
@@ -136,8 +137,9 @@ export default new Vuex.Store({
             token: res.data.access_token,
             userId: res.data.localId
           })
-          dispatch('setLogoutTimer', res.data.expiresIn)
-          router.replace('/');
+          dispatch('setLogoutTimer', res.data.expiresIn),
+          console.log(this.getters.isAuthenticated),
+          window.location.replace('/')
         })
         .catch(
           error =>{ 

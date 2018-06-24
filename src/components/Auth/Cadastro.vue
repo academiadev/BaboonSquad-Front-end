@@ -183,7 +183,7 @@
          .catch(erro => 
             console.log(erro),
             this.sending = false,
-            erro != null ? this.errorSaved = true : null,
+            setError()
          )
       },
       validateUser () {
@@ -194,6 +194,9 @@
         } else {
             this.sending = false
         }
+      },
+      setError(){
+        this.errorSaved = true
       }
     },
   }
