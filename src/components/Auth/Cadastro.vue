@@ -48,7 +48,7 @@
               </md-field>
             </div>
 
-            <md-radio v-model="radio" :value=2 class="md-primary">Inserir código existente {{radio}} </md-radio>
+            <md-radio v-model="radio" :value=2 class="md-primary">Inserir código existente </md-radio>
             <md-radio v-model="radio" :value=1  class="md-primary">Criar nova empresa  <small>(Admin)</small></md-radio>
             
             <div class="md-layout-item md-small-size-100"  v-if="radio===1">
@@ -183,7 +183,7 @@
          .catch(erro => 
             console.log(erro),
             this.sending = false,
-            this.errorSaved = true
+            setError()
          )
       },
       validateUser () {
@@ -194,6 +194,9 @@
         } else {
             this.sending = false
         }
+      },
+      setError(){
+        this.errorSaved = true
       }
     },
   }

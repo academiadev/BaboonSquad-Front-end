@@ -83,7 +83,13 @@
     },
     computed: {
       redefinePassword () {
-        return this.$store.getters.redefinePassword
+        return this.$store.getters.redefinePassword || this.$store.getters.isAuthenticated
+      },
+      auth () {
+        return this.$store.getters.isAuthenticated
+      },
+      emailUser () {
+        return this.$store.getters.email
       }
     },     
     methods: {
@@ -115,7 +121,8 @@
         this.sending = true
         const data = {
           password: this.form.password,
-          code: this.$route.params.id
+          code: this.$route.params.id,
+          emailUser: this.emailUser != null ? this.emailUser : null
       }
          this.$store.dispatch('redefinePassword', data).then(res => { console.log(res) } ).catch(erro => console.log(error) )
 
@@ -125,6 +132,7 @@
       adevpassword: Password
     },
     created() {
+        if(!this.auth)
          this.$store.dispatch('getUsedPassword', this.$route.params.id).then(res => { console.log(res) } ).catch(erro => console.log(error) )
     }
   }

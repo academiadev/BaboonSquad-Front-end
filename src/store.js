@@ -30,7 +30,7 @@ export default new Vuex.Store({
       var base64Url = state.idToken.split('.')[1];
       var base64 = base64Url.replace('-', '+').replace('_', '/');
       var payload = JSON.parse(window.atob(base64));
-
+      console.log(payload)
       state.user = payload.user,
       state.userId = payload.userId,
       state.email = payload.sub,
@@ -72,7 +72,7 @@ export default new Vuex.Store({
 
     },
     save({commit, dispatch}, form){
-      commit('clearErroData'),
+      commit('clearAuthData'),
       commit('clearErroData'),
       axios.post('pessoa/gravar',{
         name: form.name,
@@ -93,7 +93,6 @@ export default new Vuex.Store({
 
     },
     alter({commit, dispatch}, form){
-      console.log(this.state.email+1)
       commit('clearAuthData'),
       commit('clearErroData'),
       axios.post('pessoa/alterar',{
@@ -102,7 +101,19 @@ export default new Vuex.Store({
         email: form.email
       })
         .then(res => {
-          console.log(this.state.email)
+          console.log(res)
+          const expirationDate = new Date(now.getTime() + res.data.expires_in * 1000)
+          localStorage.setItem('token', res.data.access_token)
+          localStorage.setItem('expirationDate', expirationDate)
+          console.log(1)
+          commit('authUser', {
+            token: res.data.access_token,
+            userId: res.data.localId
+          })
+
+          dispatch('setLogoutTimer', res.data.expiresIn)
+
+          router.replace('../');
         })
         .catch(
           error =>{ 
@@ -117,6 +128,7 @@ export default new Vuex.Store({
         returnSecureToken: true
       })
         .then(res => {
+          console.log(res)
           const now = new Date()
           const expirationDate = new Date(now.getTime() + res.data.expires_in * 1000)
           localStorage.setItem('token', res.data.access_token)
@@ -125,8 +137,9 @@ export default new Vuex.Store({
             token: res.data.access_token,
             userId: res.data.localId
           })
-          dispatch('setLogoutTimer', res.data.expiresIn)
-          router.replace('/');
+          dispatch('setLogoutTimer', res.data.expiresIn),
+          console.log(this.getters.isAuthenticated),
+          window.location.replace('/')
         })
         .catch(
           error =>{ 
@@ -148,9 +161,12 @@ export default new Vuex.Store({
     redefinePassword({commit, dispatch}, data){
       axios.post('/password/alter', {
         newPassword: data.password,
-        code: data.code
+        code: data.code,
+        emailUser: data.emailUser
       }).then(res =>{
         console.log(res)
+        router.replace('../')
+
       })
       .catch(error => console.log(error))
     },

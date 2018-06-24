@@ -23,7 +23,7 @@
         <md-progress-bar md-mode="indeterminate" v-if="sending" />
 
         <md-card-actions class="md-alignment-left">
-          <md-button to="./redefinirsenha" class="md-dense md-raised md-primary" :disabled="sending">Redefinir senha</md-button>
+          <md-button to="./password/novasenha" class="md-dense md-raised md-primary" :disabled="sending">Redefinir senha</md-button>
         </md-card-actions>
 
         <md-card-actions>
@@ -32,7 +32,6 @@
 
       </md-card>
 
-      <md-snackbar :md-active.sync="userSaved">The user {{ lastUser }} was saved with success!</md-snackbar>
     </form>
   </div>
 </template>
@@ -86,10 +85,6 @@
         this.form.email = null
       },
       OnSubmit () {
-        window.setTimeout(() => {
-          this.sending = false
-          this.clearForm()
-        }, 1500)
         this.sending = true
         const formData = {
           name: this.form.name,
@@ -97,7 +92,9 @@
           email: this.$store.getters.email
         }
          this.$store.dispatch('alter', formData).then(res => { 
-            this.userSaved = true
+            this.userSaved = true,
+            this.clearForm()
+
           })
          .catch(erro => 
             console.log(erro),
