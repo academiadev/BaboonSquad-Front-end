@@ -42,11 +42,9 @@
           <md-field>
             <md-file placeholder="Selecione uma imagem" @change="onFileUpload($event)" accept="image/*" />
           </md-field>
-          <md-card-media class="img-refund">
-            <div v-if="form.fileName">
-              <img :src="form.fileName" alt="Reemblso" />
-              <img :src="'./remove-10x10.png'" alt="Remover" />
-            </div>
+          <md-card-media v-if="form.fileName">
+              <img :src="form.fileName" class="img-refund"/>
+              <img src="../../assets/remove-24x24.png" title="Remover" class="img-refund-remove" />
           </md-card-media>
 
         </md-card-content>
@@ -150,8 +148,7 @@ export default {
   methods: {
     onFileUpload(event) {
       const files = event.target.files || event.dataTransfer.files;
-      if (!files.length)
-        return;
+      if (!files.length) return;
 
       this.createImage(files[0]);
     },
@@ -159,13 +156,13 @@ export default {
       var image = new Image();
       var reader = new FileReader();
 
-      reader.onload = (e) => {
+      reader.onload = e => {
         this.form.fileName = e.target.result;
       };
       reader.readAsDataURL(file);
     },
-    removeImage(){
-        this.form.fileName = null;
+    removeImage() {
+      this.form.fileName = null;
     },
     getValidationClass(fieldName) {
       const field = this.$v.form[fieldName];
@@ -280,10 +277,15 @@ export default {
   padding-left: 50px;
   padding-right: 50px;
 }
-.img-refund{
-  margin-left: 50px;
-  width: 100px;
-  right: 50px;
+img.img-refund {
+  width: calc(100% - 30px);
+  padding-left: 5px;
+  cursor: pointer;
 }
-
+img.img-refund-remove {
+  height: 24px;
+  width: 24px;
+  float: left;
+  cursor: pointer;
+}
 </style>
