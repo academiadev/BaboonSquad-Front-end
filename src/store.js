@@ -18,7 +18,6 @@ export default new Vuex.Store({
     company: null,
     isAdmin: false,
     refundCategory: ["Outros", "Hospedagem", "Transporte", "Alimentação"],
-    refundsExpenseGraph: [],
     erro: null,
     redefinePassword: false
   },
@@ -47,10 +46,14 @@ export default new Vuex.Store({
       state.isAdmin = false;
       axios.defaults.headers.common['Authorization'] = '';
     },
+<<<<<<< HEAD
     setRefunds(state, data) {
       state.refundsExpenseGraph = data;
     },
     clearErroData(state) {
+=======
+    clearErroData(state){
+>>>>>>> 9cc6fea1e8ccdc06574c03ff4a532d92e2930263
       state.erro = null;
     }
   },
@@ -174,14 +177,6 @@ export default new Vuex.Store({
       localStorage.removeItem('expirationDate')
       localStorage.removeItem('token')
       router.push('/login')
-    },
-    getRefundExpense({ commit, state }) {
-      var config = {
-        headers: { 'Authorization': 'Bearer ' + state.idToken }
-      };
-      axios.get('/reembolso/listaReembolsosCategoria/', config)
-        .then(res => commit('setRefunds', res.data))
-        .catch(error => console.error(error))
     }
   },
   getters: {
@@ -212,10 +207,14 @@ export default new Vuex.Store({
     refundCategory(state) {
       return state.refundCategory
     },
+<<<<<<< HEAD
     refundsExpenseGraph(state) {
       return state.refundsExpenseGraph
     },
     erro(state) {
+=======
+    erro(state){
+>>>>>>> 9cc6fea1e8ccdc06574c03ff4a532d92e2930263
       return state.erro
     },
     redefinePassword(state) {

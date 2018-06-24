@@ -22,7 +22,7 @@ export default {
   methods: {
     fetchData(){
       const userId = this.$store.getters.userId;
-      axios.get('/reembolso/listaReembolsosCategoria/'+ userId)
+      axios.get('/reembolso/listaReembolsosCategoria/'+ parseInt(userId))
         .then(res => {
             this.refunds = this.refundAdapter(res.data);
         })
