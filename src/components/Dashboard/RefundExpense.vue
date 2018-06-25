@@ -19,87 +19,70 @@
         <md-table-toolbar>
           <h1 class="md-title">Gastos por usuários</h1>
         </md-table-toolbar>
-
-        <!--<app-reembolso v-for="reembolso in reembolsos" :key="reembolso.id" :reembolso="reembolso"></app-reembolso>-->
+        <md-table-row v-if="refunds.length == 0" slot="md-table-row" md-selectable="multiple" md-auto-select>
+         <md-table-cell class="empty-line" >Nenhum gasto encontrado</md-table-cell>
+       </md-table-row> 
+        <app-reembolso v-for="refund in refunds" :key="refund.id" :refund="refund"></app-reembolso>
       </md-table>
     </div>
   </div>
 </template>
 
 <script>
-  import axios from "@/axios-auth";
-  import Reembolso from './RefundExpenseItem.vue';
-  import RefundExpenseGraph from './refundExpenseGraph.vue';
+import axios from "@/axios-auth";
+import Reembolso from "./RefundExpenseItem.vue";
+import RefundExpenseGraph from "./refundExpenseGraph.vue";
 
-  export default {
-    name: 'TableCard',
-    data() {
-      return {
-        title: "Dashboard Gastos",
-        refunds: this.refunds || [],
-        /*reembolsos: [
-          {
-            id:1,
-            email: 'sdubbin0@geocities.com',
-            reembolso: 'Melão',
-            status: 'A',
-            Valor: '20',
-            categoria: 'Alimentação',
-            user: 'Shawna Dubbin'
-          },
-          {
-            id:2,
-            email: 'teste@gmail.com',
-            reembolso: 'Abobora',
-            status: 'A',
-            Valor: '20',
-            categoria: 'Alimentação',
-            user: 'Shawna Dubbin'
-          },
-          {
-            id:3,
-            email: 'cmarietonh@theatlantic.com',
-            reembolso: 'Banana',
-            status: 'A',
-            Valor: '20',
-            categoria: 'Alimentação',
-            user: 'Shawna Dubbin'
-          },
-          {
-            id:4,
-            email: 'sdubbin0@geocities.com',
-            reembolso: 'Goiaba',
-            status: 'A',
-            Valor: '20',
-            categoria: 'Alimentação',
-            user: 'Clarinda Marieton'
-          }
-        ]*/
-        
+export default {
+  name: "TableCard",
+  data() {
+    return {
+      title: "Dashboard Gastos",
+      refunds: this.refunds || []
+    };
+  },
+  methods: {
+    getSpentForUser() {
+      axios
+        .get("/reembolso/spent/" + this.company)
+        .then(res => this.refundsAdapter(res.data))
+        .catch(error => console.error(error));
+    },
+    getValues(grouping) {
+      return Object.values(grouping);
+    },
+    refundsAdapter(refunds) {
+      this.refunds = this.getValues(refunds.reduce(this.groupByEmail, {}));
+    },
+    groupByEmail(groups, refund) {
+      refund.value = parseFloat(refund.value);
+      if (!groups[refund.email]) {
+        groups[refund.email] = refund;
+        return groups;
       }
-      //this.getSpentForUser()
-      
-    },
-    methods: {
-      getSpentForUser(){
-        axios.get('/reembolso/spent/'+this.company)
-        .then( res => { console.log(res.data) })
-        .catch(error => { console.error(error) })
-      }
-    },
-    components: {
-      appReembolso: Reembolso,
-      refundExpenseGraph: RefundExpenseGraph
-    },
-    created () {
-      this.$store.commit('changeTitle', this.title);
-      this.getSpentForUser();
-      //console.log(this.company);
-    },
-    computed: {
-      company() {
-        return this.$store.getters.company;
-      }
+      groups[refund.email].value += refund.value;
+      return groups;
+    }
+  },
+  components: {
+    appReembolso: Reembolso,
+    refundExpenseGraph: RefundExpenseGraph
+  },
+  created() {
+    this.$store.commit("changeTitle", this.title);
+    this.getSpentForUser();
+  },
+  computed: {
+    company() {
+      return this.$store.getters.company;
     }
   }
+};
 </script>
+
+
+<style lang="scss" scoped>
+.empty-line {
+  text-align: center;
+}
+</style>
