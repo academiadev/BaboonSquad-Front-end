@@ -154,9 +154,6 @@ export default {
       return this.$store.getters.email;
     }
   },
-  created() {
-    this.createImage();
-  },
   methods: {
     show() {
       const vuer = this.$el.querySelector(".images").$vuer;
@@ -205,11 +202,12 @@ export default {
         .get("reembolso/getImage/" + this.form.file, {
           responseType: "arraybuffer"
         })
-        .then(res => {
-          this.fileImage = `data:image/jpg;base64,${this.convertBytesToBase64(
-            res.data
-          )}`;
-        })
+        .then(
+          res =>
+            (this.fileImage = `data:image/jpg;base64,${this.convertBytesToBase64(
+              res.data
+            )}`)
+        )
         .catch(error => console.error("get", error));
     },
     removeImage() {
@@ -267,9 +265,7 @@ export default {
         showForUser: true,
         company: this.company
       };
-      axios
-        .post("reembolso/", formData)
-        .catch(error => console.error(error));
+      axios.post("reembolso/", formData).catch(error => console.error(error));
       this.sending = false;
       this.clearForm();
     },
@@ -319,6 +315,8 @@ export default {
       this.form.value = this.refund.value;
       this.form.user = this.refund.user;
       this.form.file = this.refund.file;
+
+      this.createImage();
     }
   }
 };
