@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="app">
     <line-chart :data="refunds" legend="top" :curve="true" prefix="R$">
     </line-chart>

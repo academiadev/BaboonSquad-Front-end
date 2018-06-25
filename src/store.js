@@ -1,4 +1,4 @@
-import Vue from 'vue'
+﻿import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from './axios-auth'
 
@@ -28,6 +28,7 @@ export default new Vuex.Store({
       var base64Url = state.idToken.split('.')[1];
       var base64 = base64Url.replace('-', '+').replace('_', '/');
       var payload = JSON.parse(window.atob(base64));
+      console.log(payload)
       state.user = payload.user,
         state.userId = payload.userId,
         state.email = payload.sub,

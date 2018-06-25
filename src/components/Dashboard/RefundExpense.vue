@@ -4,7 +4,8 @@
       <md-empty-state></md-empty-state>
       <md-table class="md-alignment-top-center" md-card>
         <md-table-toolbar>
-          <h1 class="md-title">Gastos por Categoria</h1>
+          <h1 class="md-title">Gastos por Categoria     {{company}}
+</h1>
         </md-table-toolbar>
         <refund-expense-graph />
       </md-table>
@@ -19,14 +20,14 @@
           <h1 class="md-title">Gastos por usuários</h1>
         </md-table-toolbar>
 
-        <app-reembolso v-for="reembolso in reembolsos" :key="reembolso.id" :reembolso="reembolso"></app-reembolso>
-
+        <!--<app-reembolso v-for="reembolso in reembolsos" :key="reembolso.id" :reembolso="reembolso"></app-reembolso>-->
       </md-table>
     </div>
   </div>
 </template>
 
 <script>
+  import axios from "@/axios-auth";
   import Reembolso from './RefundExpenseItem.vue';
   import RefundExpenseGraph from './refundExpenseGraph.vue';
 
@@ -35,7 +36,8 @@
     data() {
       return {
         title: "Dashboard Gastos",
-        reembolsos: [
+        refunds: this.refunds || [],
+        /*reembolsos: [
           {
             id:1,
             email: 'sdubbin0@geocities.com',
@@ -72,7 +74,17 @@
             categoria: 'Alimentação',
             user: 'Clarinda Marieton'
           }
-        ]
+        ]*/
+        
+      }
+      //this.getSpentForUser()
+      
+    },
+    methods: {
+      getSpentForUser(){
+        axios.get('/reembolso/spent/'+this.company)
+        .then( res => { console.log(res.data) })
+        .catch(error => { console.error(error) })
       }
     },
     components: {
@@ -80,7 +92,14 @@
       refundExpenseGraph: RefundExpenseGraph
     },
     created () {
-      this.$store.commit('changeTitle', this.title)
+      this.$store.commit('changeTitle', this.title);
+      this.getSpentForUser();
+      //console.log(this.company);
+    },
+    computed: {
+      company() {
+        return this.$store.getters.company;
+      }
     }
   }
 </script>
