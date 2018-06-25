@@ -10,9 +10,36 @@ import axios from '@/axios-auth';
 
 export default {
   data() {            
-    console.log(this.refunds);
     return {
-      refunds: this.refunds || [],
+      refunds: [{
+    "name": "Transporte",
+    "data": {
+        "2017-01-02": "344",
+        "2017-05-24": "183",
+        "2017-05-26": "173",
+        "2017-06-22": "346",
+        "2017-07-28": "215"
+    }
+}, {
+    "name": "Alimentação",
+    "data": {
+        "2017-01-01": "289",
+        "2017-01-31": "287",
+        "2017-02-01": "238",
+        "2017-05-05": "170"
+    }
+}, {
+    "name": "Hospedagem",
+    "data": {
+        "2017-01-04": "69",
+        "2017-05-07": "41",
+        "2017-06-22": "259",
+        "2017-06-27": "216"
+    }
+}, {
+    "name": "Outros",
+    "data": {}
+}],
       max: 500,
       count: 0
     };

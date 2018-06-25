@@ -9,6 +9,7 @@ import RefundManagement from '@/components/Dashboard/RefundManagement.vue'
 import RedefinirSenha from '@/components/password/RedefinirSenha.vue'
 import NewPassword from '@/components/password/NewPassword.vue'
 import MessageRedefine from '@/components/password/MessageRedefine.vue'
+import NotFound from '@/components/Shared/NotFound.vue'
 
 
 import store from '../store'
@@ -114,6 +115,11 @@ export default new Router({
       path: '/password/message/:email',
       name: 'MessageRedefine',
       component: MessageRedefine,
-    }
+    },
+    {
+      path: '/*',
+      name: 'NotFound',
+      component: NotFound
+    } 
   ]
 })

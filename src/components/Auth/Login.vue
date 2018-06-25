@@ -29,7 +29,7 @@
         <md-card-actions>
           <md-button type="submit"  class="md-dense md-raised md-primary" :disabled="sending">Login</md-button>
         </md-card-actions>
-        <div class="md-layout md-alignment-top-center">
+        <div class="md-layout md-alignment-center">
           <md-button to="../password/redefinirsenha">ESQUECI MINHA SENHA</md-button>
           <md-button to="./cadastro">QUERO ME CADASTRAR </md-button>
         </div>
@@ -100,7 +100,7 @@
         this.$store.dispatch('login', {email: this.form.email, password: this.form.password})
         .catch(erro => 
           console.logn(erro),
-          erro != null ? this.errorSaved = true : null,
+          this.setError(),
           this.sending = false
         )
       },
@@ -110,6 +110,9 @@
         if (!this.$v.$invalid) {
           this.saveUser()
         }
+      },
+      setError(){
+        this.errorSaved = true
       }
     }
   }
@@ -142,10 +145,6 @@
 .md-card-actions {
 	padding-left: 50px;
 	padding-right: 50px;
-}
-
-.md-layout{
-  padding-left: 60px;
 }
 //!Global
 </style>

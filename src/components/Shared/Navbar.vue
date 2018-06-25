@@ -1,14 +1,16 @@
 <template>
   <div>
   <md-toolbar class="md-primary">
+    <div style="flex: 1">
     <md-button class="md-icon-button" @click="showNavigation = true">
       <md-icon>menu</md-icon>
     </md-button>
     <md-button class="md-title" to='/'>{{ title }}</md-button>
+    </div>
 
-    <md-button v-show="isAdmin" class="md-raised">
+    <md-button v-show="isAdmin" class="md-raised" @click="callFunctionGetCompanyCode()">
       <md-icon id="icon-company">filter_none</md-icon>
-      {{ company }}
+      <input id="companyCode" :value="company" readonly />
     </md-button>
   </md-toolbar>
 
@@ -47,6 +49,11 @@
 </template>
 
 <script>
+  function getCompanyCode() {
+    console.log('Matheus passou aqui!');
+  //  return 'asas';
+  }
+
   export default {
     name: 'Navbar',
     data: () => ({
@@ -72,6 +79,11 @@
     methods: {
       onLogout() {
         this.$store.dispatch('logout')
+      },
+      callFunctionGetCompanyCode() {
+        var copyText = document.querySelector("#companyCode");
+        copyText.select();
+        document.execCommand("copy");
       }
     }
   }
@@ -98,5 +110,11 @@
 
   #icon-company {
     color: #000;
+  }
+
+  #companyCode {
+    border: 0;
+    width: 60px;
+    text-align: center;
   }
 </style>
