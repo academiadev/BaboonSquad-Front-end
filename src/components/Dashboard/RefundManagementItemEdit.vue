@@ -40,13 +40,14 @@
           </md-field>
         
           <md-field>
-            <md-file placeholder="Selecione uma imagem" @change="onFileUpload($event)" accept="image/*" />
+            <md-file placeholder="Selecione uma imagem" v-model="form.fileName" ref="mdfile" @change ="onFileUpload($event)" accept="image/*" />
           </md-field>
-          <md-card-media v-if="form.fileName">
-              <img :src="form.fileName" class="img-refund"/>
-              <img src="../../assets/remove-24x24.png" title="Remover" class="img-refund-remove" />
+          <md-card-media v-if="form.file">
+              <img src="../../assets/remove-24x24.png"  @click="removeImage" title="Remover" class="img-refund-remove" />
+              <div class="images" v-viewer>
+                <img :src="form.file" title="Ampliar"  class="img-refund"/>
+              </div>
           </md-card-media>
-
         </md-card-content>
 
         <md-progress-bar md-mode="indeterminate" v-if="sending" />
@@ -113,12 +114,13 @@ export default {
       value: 0,
       user: null,
       company: null,
-      fileName: null
+      file: null
     },
     selecedDate: new Date("01/01/2010"),
     userSaved: false,
     sending: false,
-    lastUser: null
+    lastUser: null,
+    fileName: null
   }),
   validations: {
     form: {
@@ -146,23 +148,53 @@ export default {
     }
   },
   methods: {
+    show() {
+      const vuer = this.$el.querySelector(".images").$vuer;
+      vuer.show();
+    },
     onFileUpload(event) {
       const files = event.target.files || event.dataTransfer.files;
       if (!files.length) return;
-
-      this.createImage(files[0]);
+      
+      this.saveImage(files[0]);
     },
-    createImage(file) {
-      var image = new Image();
-      var reader = new FileReader();
+    saveImage(file) {
+      let data = new FormData();
+      data.append("file", file);
+      this.fileName = file.name;
 
-      reader.onload = e => {
-        this.form.fileName = e.target.result;
+      const config = {
+        headers: { "content-type": "multipart/form-data" }
       };
-      reader.readAsDataURL(file);
+      axios
+        .post("reembolso/carregarImage", data, config)
+        .then(this.createImage())
+        .catch(error => console.error("post", error));
+    },
+    createImage() {
+      axios
+        .get("reembolso/getImage/" + this.fileName, {
+          responseType: "arraybuffer"
+        })
+        .then(res => {
+          this.form.file = `data:image/jpg;base64,${this.convertBytesToBase64(
+            res.data
+          )}`;
+        })
+        .catch(error => console.error("get", error));
     },
     removeImage() {
-      this.form.fileName = null;
+      axios
+        .delete("reembolso/deleteImage/" + this.fileName)
+        .then(res => {
+            this.$refs["mdfile"].clearField();
+            this.form.file = null;
+            this.fileName = null;
+        })
+        .catch(error => console.error("delete", error));  
+    },
+    convertBytesToBase64(file) {
+      return new Buffer(file, "binary").toString("base64");
     },
     getValidationClass(fieldName) {
       const field = this.$v.form[fieldName];
@@ -180,7 +212,7 @@ export default {
       this.form.type = null;
       this.form.date = null;
       this.form.value = 0;
-      this.form.fileName = null;
+      this.form.file = null;
     },
     saveRefund() {
       this.sending = true;
@@ -199,7 +231,7 @@ export default {
         value: formatValue(this.form.value),
         userName: this.email,
         company: this.company,
-        fileName: this.form.fileName
+        file: this.form.file
       };
       console.log(formData);
       axios
@@ -220,7 +252,7 @@ export default {
         value: formatValue(this.form.value),
         userName: this.email,
         company: this.company,
-        fileName: this.form.fileName
+        file: this.form.file
       };
       console.log(formData);
       axios
@@ -278,7 +310,7 @@ export default {
   padding-right: 50px;
 }
 img.img-refund {
-  width: calc(100% - 30px);
+  width: calc(100% - 24px);
   padding-left: 5px;
   cursor: pointer;
 }

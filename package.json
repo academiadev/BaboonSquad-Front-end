@@ -13,6 +13,7 @@
     "axios": "^0.18.0",
     "chart.js": "^2.7.2",
     "v-money": "^0.8.1",
+    "v-viewer": "^1.0.1",
     "vue": "^2.5.2",
     "vue-chartkick": "^0.3.3",
     "vue-event-bus": "^1.0.2",
