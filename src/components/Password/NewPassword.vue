@@ -49,131 +49,131 @@
 </template>
 
 <script>
-  import Password from '../Shared/Password.vue'
-  import { validationMixin } from 'vuelidate'
-  import {
-    required,
-    minLength,
-    sameAs
-  } from 'vuelidate/lib/validators'
+import Password from "../Shared/Password.vue";
+import { validationMixin } from "vuelidate";
+import { required, minLength, sameAs } from "vuelidate/lib/validators";
 
-  export default {
-    name: 'NovaSenha',
-    mixins: [validationMixin],
-    data: () => ({
-      form: {
-        password: null,
-        confirmPassword: null
-      },
-      userSaved: false,
-      sending: false,
-      lastUser: null
-    }),
-    validations: {
-      form: {
-        password: { 
-          required,
-          minLength: minLength(3)
-        },
-        confirmPassword: {
-          required,
-          sameAs: sameAs('password')
-        }
-      }
+export default {
+  name: "NovaSenha",
+  mixins: [validationMixin],
+  data: () => ({
+    form: {
+      password: null,
+      confirmPassword: null
     },
-    computed: {
-      redefinePassword () {
-        return this.$store.getters.redefinePassword || this.$store.getters.isAuthenticated
+    userSaved: false,
+    sending: false,
+    lastUser: null
+  }),
+  validations: {
+    form: {
+      password: {
+        required,
+        minLength: minLength(3)
       },
-      auth () {
-        return this.$store.getters.isAuthenticated
-      },
-      emailUser () {
-        return this.$store.getters.email
+      confirmPassword: {
+        required,
+        sameAs: sameAs("password")
       }
-    },     
-    methods: {
-      getValidationClass (fieldName) {
-        const field = this.$v.form[fieldName]
-
-        if (field) {
-          return {
-            'md-invalid': field.$invalid && field.$dirty
-          }
-        }
-      },
-      clearForm () {
-        this.$v.$reset()
-        this.form.password = null
-        this.form.confirmPassword = null
-      },
-      validatePassword (value) {
-        this.$v.password.$invalid = value
-      },
-      validatePasswords () {
-        this.$v.$touch()
-
-        if (!this.$v.$invalid) {
-          this.OnSubmit()
-        }
-      },
-      OnSubmit () {
-        this.sending = true
-        const data = {
-          password: this.form.password,
-          code: this.$route.params.id,
-          emailUser: this.emailUser != null ? this.emailUser : null
-      }
-         this.$store.dispatch('redefinePassword', data).then(res => { console.log(res) } ).catch(erro => console.log(error) )
-
-      },
-    },
-    components: {
-      adevpassword: Password
-    },
-    created() {
-        if(!this.auth)
-         this.$store.dispatch('getUsedPassword', this.$route.params.id).then(res => { console.log(res) } ).catch(erro => console.log(error) )
     }
+  },
+  computed: {
+    redefinePassword() {
+      return (
+        this.$store.getters.redefinePassword ||
+        this.$store.getters.isAuthenticated
+      );
+    },
+    auth() {
+      return this.$store.getters.isAuthenticated;
+    },
+    emailUser() {
+      return this.$store.getters.email;
+    }
+  },
+  methods: {
+    getValidationClass(fieldName) {
+      const field = this.$v.form[fieldName];
+
+      if (field) {
+        return {
+          "md-invalid": field.$invalid && field.$dirty
+        };
+      }
+    },
+    clearForm() {
+      this.$v.$reset();
+      this.form.password = null;
+      this.form.confirmPassword = null;
+    },
+    validatePassword(value) {
+      this.$v.password.$invalid = value;
+    },
+    validatePasswords() {
+      this.$v.$touch();
+
+      if (!this.$v.$invalid) {
+        this.OnSubmit();
+      }
+    },
+    OnSubmit() {
+      this.sending = true;
+      const data = {
+        password: this.form.password,
+        code: this.$route.params.id,
+        emailUser: this.emailUser != null ? this.emailUser : null
+      };
+      this.$store
+        .dispatch("redefinePassword", data)
+        .catch(erro => console.error(error));
+    }
+  },
+  components: {
+    adevpassword: Password
+  },
+  created() {
+    if (!this.auth)
+      this.$store
+        .dispatch("getUsedPassword", this.$route.params.id)
+        .catch(erro => console.error(error));
   }
+};
 </script>
 
 <style lang="scss" scoped>
-  .md-progress-bar {
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-  }
+.md-progress-bar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+}
 
+//Global
+.md-card-header {
+  background: #2687e9;
+  color: #fff;
+}
 
-  //Global
-  .md-card-header {
-  	background: #2687e9;
-  	color: #fff;
-  }
+.md-button.md-dense {
+  width: 100%;
+}
 
-  .md-button.md-dense {
-  	width: 100%;
-  }
+.md-card-content {
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-top: 15px;
+}
 
-  .md-card-content {
-  	padding-left: 50px;
-  	padding-right: 50px;
-    padding-top: 15px;
-  }
+.md-card-actions {
+  padding-left: 50px;
+  padding-right: 50px;
+}
+//!Global
 
-  .md-card-actions {
-  	padding-left: 50px;
-  	padding-right: 50px;
-  }
-  //!Global
-
-  .md-card-actions {
-  	padding-bottom: 15px;
-  }
-  .already-accessed{
-    font-size: 20px;
-  }
-
+.md-card-actions {
+  padding-bottom: 15px;
+}
+.already-accessed {
+  font-size: 20px;
+}
 </style>

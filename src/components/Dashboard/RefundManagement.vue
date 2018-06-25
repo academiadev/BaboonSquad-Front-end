@@ -5,8 +5,6 @@
         <div v-if="isAdmin">
           <md-button :disabled="!(hasSelected)" @click="changeStatus('approved')" class="md-raised md-primary">Aprovar</md-button>
           <md-button :disabled="hasAproved" @click="changeStatus('reject')" class="md-raised md-accent">Recusar</md-button>
-        </div>
-        <div>
           <md-button @click="editRefund" :disabled="hasAproved" class="md-raised md-primary">Editar</md-button>
           <md-button @click="deleteRefunds" :disabled="!(hasSelected)" class="md-raised md-accent">Excluir</md-button>
         </div>  
@@ -93,16 +91,16 @@ const toLower = text => {
 };
 
 const searchByName = (items, term) => {
-  if (term) {
-    return items.filter(item => toLower(item.name).includes(toLower(term)));
-  }
-
-  return items;
+  return !term
+    ? items
+    : items.filter(item => toLower(item.name).includes(toLower(term)));
 };
+
 import axios from "@/axios-auth";
 import Status from "./RefundStatus.vue";
 import Category from "./RefundCategory.vue";
 import RefundManagementItemEdit from "./RefundManagementItemEdit.vue";
+
 export default {
   data() {
     return {
@@ -123,33 +121,29 @@ export default {
       this.selected = items;
     },
     deleteRefunds() {
-       const formData = this.listRefundsId;
-       
+      const formData = this.listRefundsId;
+
       axios
         .delete("reembolso/delete", { data: formData })
-        .then(res => {
-          console.log(res);
-          this.getRefundsByUser();
-        })
-        .catch(error => console.log(error));
+        .then(res => this.getRefundsByUser())
+        .catch(error => console.error(error));
     },
     insertRefund() {
-      this.refundEdit = null; 
-      this.showEdit = true; 
+      this.refundEdit = null;
+      this.showEdit = true;
     },
     editRefund() {
-      this.showEdit = true;  
+      this.showEdit = true;
     },
     changeStatus(refundStatus) {
       const formData = this.listRefundsId;
       axios
-        .put("reembolso/changeStatus/"+ refundStatus, formData)
+        .put("reembolso/changeStatus/" + refundStatus, formData)
         .then(res => {
-          console.log(res);
           this.$router.push("/reembolsos");
-          this.getRefundsByUser;s
+          this.getRefundsByUser;
         })
-        .catch(error => console.log(error));
+        .catch(error => console.error(error));
     },
     searchOnTable() {
       if (this.search.trim()) {
@@ -161,47 +155,33 @@ export default {
     },
     getRefundsByUser() {
       axios
-        .get("/reembolso/usuario/" + this.usersId +"/visible")
+        .get("/reembolso/usuario/" + this.usersId + "/visible")
         .then(res => {
-          console.log(res.data);
-          this.refunds = [];
-          res.data.forEach(refundData => {
-            if(refundData.showForUser=="true"){
-              this.refunds.push(refundData);
-            }
-          });
-          this.searched = this.refunds;
+          const refunds = res.data.filter(refundData => refundData.showForUser);
+
+          this.refunds = refunds;
+          this.searched = refunds;
           this.showEdit = false;
         })
-        .catch(error => console.log(error));
+        .catch(error => console.error(error));
     }
   },
   computed: {
     listRefundsId() {
-      const formData =[];
-       this.selected.forEach(refund => {
-         formData.push({id : refund.id })
-       })
-      return formData;
+      return this.selected.map(refund => {
+        return { id: refund.id };
+      });
     },
     hasSelected() {
       return this.selected[0] != null;
     },
     hasAproved() {
-      let bool = false;
-      if(this.hasSelected){
-        this.selected.forEach(refundSelected => {
-         if(refundSelected.status == 0){
-          bool = true;
-         } 
-        })
-      }else{
-        bool = true;
-      }
-      return bool;
+      if (!this.hasSelected) return true;
+
+      return this.selected.some(refundSelected => refundSelected.status == 0);
     },
     textEmptyState() {
-      if (this.search==null) {
+      if (this.search == null) {
         return "Cadastre um novo reembolso no botão abaixo.";
       }
       return (
