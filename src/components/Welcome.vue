@@ -19,7 +19,7 @@
   export default {
     data: () => ({
       title: 'ReembolsoAzul',
-      user: null
+      user: null,
     }),
     computed: {
       auth () {

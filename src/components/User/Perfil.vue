@@ -26,6 +26,9 @@
           <md-button to="./password/novasenha" class="md-dense md-raised md-primary" :disabled="sending">Redefinir senha</md-button>
         </md-card-actions>
 
+        <md-snackbar :md-active.sync="errorSaved">{{ error }}</md-snackbar>
+
+
         <md-card-actions>
           <md-button type="submit">Atualizar</md-button>
         </md-card-actions >
@@ -55,7 +58,8 @@
       },
       userSaved: false,
       sending: false,
-      lastUser: null
+      lastUser: null,
+      errorSaved: null
     }),
     validations: {
       form: {
@@ -67,6 +71,11 @@
           required,
           email
         }
+      }
+    },
+    computed: {
+      error () {
+        return this.$store.getters.erro != null ? this.$store.getters.erro.message : null ;
       }
     },
     methods: {
@@ -89,28 +98,17 @@
         const formData = {
           name: this.form.name,
           newEmail: this.form.email,
-          email: this.$store.getters.email
+          userId: this.$store.getters.userId
         }
          this.$store.dispatch('alter', formData).then(res => { 
-            this.userSaved = true,
-            this.clearForm()
+           console.log(res)
+        })
+        .catch(error => { 
+          this.$store.dispatch('setError', error.response.data)
+          this.setError();
+          this.sending = false;
+        })
 
-          })
-         .catch(erro => 
-            console.log(erro),
-            this.sending = false
-          )
-      },
-      saveUser () {
-        this.sending = true
-
-        // Instead of this timeout, here you can call your API
-        window.setTimeout(() => {
-          this.lastUser = `${this.form.firstName} ${this.form.lastName}`
-          this.userSaved = true
-          this.sending = false
-          this.clearForm()
-        }, 1500)
       },
       validateUser () {
         this.$v.$touch()
@@ -118,6 +116,9 @@
         if (!this.$v.$invalid) {
           this.OnSubmit()
         }
+      },
+      setError(){
+        this.errorSaved = true
       }
     },
     created () {

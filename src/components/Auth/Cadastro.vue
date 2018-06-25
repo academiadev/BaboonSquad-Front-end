@@ -177,14 +177,16 @@
           company: this.form.company,
           typePermission: this.radio
       }
-         this.$store.dispatch('save', formData).then(res => { 
+         this.$store.dispatch('save', formData)
+         .then(res => { 
             this.userSaved = true
           })
-         .catch(erro => 
-            console.log(erro),
-            this.sending = false,
-            erro != null ? this.errorSaved = true : null,
-         )
+          .catch(error => {
+            this.$store.dispatch('setError', error.response.data)
+            this.setError();
+            this.sending = false;
+          })
+
       },
       validateUser () {
         this.$v.$touch()
@@ -194,6 +196,9 @@
         } else {
             this.sending = false
         }
+      },
+      setError(){
+        this.errorSaved = true
       }
     },
   }
