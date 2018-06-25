@@ -10,7 +10,6 @@ import axios from '@/axios-auth';
 
 export default {
   data() {            
-    console.log(this.refunds);
     return {
       refunds: this.refunds || [],
       count: 0

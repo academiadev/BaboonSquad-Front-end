@@ -2,7 +2,7 @@
 
     <form novalidate class="md-layout" @submit.prevent="validateRefund">
       <md-card>
-        <md-card-header>
+    <md-card-header>
           <div class="md-title">Dados do Reembolso</div>
         </md-card-header>
 
@@ -12,7 +12,7 @@
           </div>
             <md-field :class="getValidationClass('name')">
               <label for="name">Nome do reembolso</label>
-              <md-input name="name" id="name" autocomplete="given-name" v-model="form.name" :disabled="sending" />
+              <md-input name="name" id="name" v-model="form.name" :disabled="sending" />
               <span class="md-error" v-if="!$v.form.name.required">É necesario nomear o reembolso</span>
               <span class="md-error" v-else-if="!$v.form.name.minlength">O nome do reembolso deve possuir mais de {{ $v.form.name.$params.minLength.min }} letras</span>
             </md-field>
@@ -20,7 +20,7 @@
           <md-field  :class="getValidationClass('type')">
             <label for="type">Categoria</label>
             <md-select v-model="form.type"  name="type" id="type">
-              <md-option value=null>Escolha</md-option>
+              <md-option disabled value="">Escolha</md-option>
               <md-option value=0>Outros</md-option>
               <md-option value=1>Hospedagem</md-option>
               <md-option value=2>Transposte</md-option>
@@ -29,7 +29,7 @@
             <span class="md-error">O reembolso deve possuir uma categoria</span>
           </md-field>
           
-          <md-datepicker :class="getValidationClass('date')" id="date" v-model="form.date" md-immediately/>
+          <md-datepicker md-immediately="true" :class="getValidationClass('date')" id="date" v-model="form.date"/>
         
           <md-field :class="getValidationClass('value')">
             <label for="value">Valor</label>
@@ -53,25 +53,30 @@
         <md-progress-bar md-mode="indeterminate" v-if="sending" />
 
         <md-card-actions>
-          <md-button type="reset" @click="Close"  :disabled="sending">FECHAR</md-button>
+          <md-button type="reset" @click="close"  :disabled="sending">FECHAR</md-button>
           <md-button type="submit" class="md-primary" :disabled="sending">EDITAR</md-button>
         </md-card-actions>
       </md-card>
 
-      <md-snackbar :md-active.sync="userSaved">The user {{ lastUser }} was saved with success!</md-snackbar>
+      <md-snackbar :md-active.sync="refundSaved"> 
+        O reembolso {{ lastRefund }} foi salvo com sucesso!
+      </md-snackbar>
+      <md-snackbar :md-active.sync="hasError"> 
+        Erro ao salvar o reembolso {{ lastRefund }}!
+      </md-snackbar>
     </form>
 
 </template>
 
 <script>
 function formatDate(date) {
-  function pad(s) {
+  function ledingZero(s) {
     return s < 10 ? "0" + s : s;
   }
   var formatDate = new Date(date);
   return [
-    pad(formatDate.getDate()),
-    pad(formatDate.getMonth() + 1),
+    ledingZero(formatDate.getDate()),
+    ledingZero(formatDate.getMonth() + 1),
     formatDate.getFullYear()
   ].join("/");
 }
@@ -91,6 +96,8 @@ import {
   minLength,
   minValue
 } from "vuelidate/lib/validators";
+
+import refundExpenseGraphVue from './refundExpenseGraph.vue';
 
 export default {
   props: ["refund"],
@@ -112,14 +119,14 @@ export default {
       type: null,
       date: new Date(),
       value: 0,
+      file: null,
       user: null,
-      company: null,
-      file: null
+      company: null
     },
-    selecedDate: new Date("01/01/2010"),
-    userSaved: false,
+    refundSaved: false,
     sending: false,
-    lastUser: null,
+    hasError: false,
+    lastRefund: null,
     fileName: null
   }),
   validations: {
@@ -208,13 +215,17 @@ export default {
     clearForm() {
       this.$v.$reset();
       this.form.id = null;
+
+      this.form.status = null;
       this.form.name = null;
       this.form.type = null;
-      this.form.date = null;
-      this.form.value = 0;
+      this.form.value = null;
+      this.form.user = null;
       this.form.file = null;
+      this.form.company = null;
     },
     saveRefund() {
+      this.lastRefund = this.form.name;
       this.sending = true;
       if (this.form.id) {
         this.putRefund();
@@ -231,16 +242,19 @@ export default {
         value: formatValue(this.form.value),
         userName: this.email,
         company: this.company,
-        file: this.form.file
+        file: this.form.file,
+        showForUser: true,
+        company: this.company
       };
       console.log(formData);
       axios
         .post("reembolso/", formData)
         .then(res => {
           console.log(res);
-          this.$router.push("/reembolsos");
         })
         .catch(error => console.log(error));
+        this.sending = false;
+        this.clearForm();
     },
     putRefund() {
       const formData = {
@@ -251,24 +265,28 @@ export default {
         date: formatDate(this.form.date),
         value: formatValue(this.form.value),
         userName: this.email,
-        company: this.company,
-        file: this.form.file
+        file: this.form.file,
+        showForUser: true,
+        company: this.company
       };
       console.log(formData);
       axios
-        .put("reembolso/:this.form.id", { formData })
+        .put("reembolso/" + this.form.id, { formData })
         .then(res => {
           console.log(res);
-          this.$router.push("/reembolsos");
+          this.close();
         })
         .catch(error => console.log(error));
+      this.close();
+    },
+    afterSave() {
+      this.refundSaved = true;
     },
     OnSubmit() {
-      console.log(JSON.parse(JSON.stringify(this.form)));
       this.saveRefund();
     },
-    Close() {
-      this.$emit("CloseRefundEdit");
+    close() {
+      this.$emit("CloseRefundItem");
     },
     validateRefund() {
       this.$v.$touch();
@@ -276,6 +294,17 @@ export default {
       if (!this.$v.$invalid) {
         this.saveRefund();
       }
+    }
+  },
+  created() {
+    if (this.refund != null){
+      this.form.id = this.refund.id;
+      this.form.status = this.refund.status;
+      this.form.name = this.refund.name;
+      this.form.type = this.refund.category;
+      this.form.date = this.refund.date;
+      this.form.value = this.refund.value;
+      this.form.user = this.refund.user;
     }
   }
 };
