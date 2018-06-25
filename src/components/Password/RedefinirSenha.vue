@@ -21,7 +21,7 @@
         <md-progress-bar md-mode="indeterminate"></md-progress-bar>
 
         <md-card-actions>
-          <md-button type="submit" class="md-dense md-raised md-primary" >REDEFIR SENHA</md-button>
+          <md-button type="submit" class="md-dense md-raised md-primary" >REDEFINIR SENHA</md-button>
         </md-card-actions>
       </md-card>
 
