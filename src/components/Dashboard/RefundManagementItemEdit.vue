@@ -155,7 +155,6 @@ export default {
     }
   },
   created() {
-    console.log("teste");
     this.createImage();
   },
   methods: {
@@ -268,13 +267,9 @@ export default {
         showForUser: true,
         company: this.company
       };
-      console.log(formData);
       axios
         .post("reembolso/", formData)
-        .then(res => {
-          console.log(res);
-        })
-        .catch(error => console.log(error));
+        .catch(error => console.error(error));
       this.sending = false;
       this.clearForm();
     },
@@ -291,14 +286,10 @@ export default {
         showForUser: true,
         company: this.company
       };
-      console.log(formData);
       axios
         .put("reembolso/" + this.form.id, { formData })
-        .then(res => {
-          console.log(res);
-          this.close();
-        })
-        .catch(error => console.log(error));
+        .then(res => this.close())
+        .catch(error => console.error(error));
       this.close();
     },
     afterSave() {

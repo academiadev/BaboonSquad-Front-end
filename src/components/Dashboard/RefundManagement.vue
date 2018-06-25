@@ -91,16 +91,16 @@ const toLower = text => {
 };
 
 const searchByName = (items, term) => {
-  if (term) {
-    return items.filter(item => toLower(item.name).includes(toLower(term)));
-  }
-
-  return items;
+  return !term
+    ? items
+    : items.filter(item => toLower(item.name).includes(toLower(term)));
 };
+
 import axios from "@/axios-auth";
 import Status from "./RefundStatus.vue";
 import Category from "./RefundCategory.vue";
 import RefundManagementItemEdit from "./RefundManagementItemEdit.vue";
+
 export default {
   data() {
     return {
@@ -125,11 +125,8 @@ export default {
 
       axios
         .delete("reembolso/delete", { data: formData })
-        .then(res => {
-          console.log(res);
-          this.getRefundsByUser();
-        })
-        .catch(error => console.log(error));
+        .then(res => this.getRefundsByUser())
+        .catch(error => console.error(error));
     },
     insertRefund() {
       this.refundEdit = null;
@@ -143,12 +140,10 @@ export default {
       axios
         .put("reembolso/changeStatus/" + refundStatus, formData)
         .then(res => {
-          console.log(res);
           this.$router.push("/reembolsos");
           this.getRefundsByUser;
-          s;
         })
-        .catch(error => console.log(error));
+        .catch(error => console.error(error));
     },
     searchOnTable() {
       if (this.search.trim()) {
@@ -162,17 +157,13 @@ export default {
       axios
         .get("/reembolso/usuario/" + this.usersId + "/visible")
         .then(res => {
-          console.log(res.data);
-          this.refunds = [];
-          res.data.forEach(refundData => {
-            if (refundData.showForUser == "true") {
-              this.refunds.push(refundData);
-            }
-          });
-          this.searched = this.refunds;
+          const refunds = res.data.filter(refundData => refundData.showForUser);
+
+          this.refunds = refunds;
+          this.searched = refunds;
           this.showEdit = false;
         })
-        .catch(error => console.log(error));
+        .catch(error => console.error(error));
     }
   },
   computed: {

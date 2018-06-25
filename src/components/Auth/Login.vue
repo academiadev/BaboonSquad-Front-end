@@ -105,7 +105,6 @@ export default {
           password: this.form.password
         })
         .catch(error => {
-          console.log(error)
           if (error.response.data.status == 500) {
             error.response.data.message = "Usuário ou Senha incorretas";
           }

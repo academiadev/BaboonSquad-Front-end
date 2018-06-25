@@ -40,128 +40,125 @@
 </template>
 
 <script>
-  import { validationMixin } from 'vuelidate'
-  import {
-    required,
-    email,
-    minLength,
-    maxLength
-  } from 'vuelidate/lib/validators'
+import { validationMixin } from "vuelidate";
+import {
+  required,
+  email,
+  minLength,
+  maxLength
+} from "vuelidate/lib/validators";
 
-  export default {
-    mixins: [validationMixin],
-    data: () => ({
-      title: "Perfil",
-      form: {
-        name: null,
-        email: null,
-      },
-      userSaved: false,
-      sending: false,
-      lastUser: null,
-      errorSaved: null
-    }),
-    validations: {
-      form: {
-        name: {
-          required,
-          minLength: minLength(3)
-        },
-        email: {
-          required,
-          email
-        }
-      }
+export default {
+  mixins: [validationMixin],
+  data: () => ({
+    title: "Perfil",
+    form: {
+      name: null,
+      email: null
     },
-    computed: {
-      error () {
-        return this.$store.getters.erro != null ? this.$store.getters.erro.message : null ;
+    userSaved: false,
+    sending: false,
+    lastUser: null,
+    errorSaved: null
+  }),
+  validations: {
+    form: {
+      name: {
+        required,
+        minLength: minLength(3)
+      },
+      email: {
+        required,
+        email
       }
-    },
-    methods: {
-      getValidationClass (fieldName) {
-        const field = this.$v.form[fieldName]
-
-        if (field) {
-          return {
-            'md-invalid': field.$invalid && field.$dirty
-          }
-        }
-      },
-      clearForm () {
-        this.$v.$reset()
-        this.form.name = null
-        this.form.email = null
-      },
-      OnSubmit () {
-        this.sending = true
-        const formData = {
-          name: this.form.name,
-          newEmail: this.form.email,
-          userId: this.$store.getters.userId
-        }
-         this.$store.dispatch('alter', formData).then(res => { 
-           console.log(res)
-        })
-        .catch(error => { 
-          this.$store.dispatch('setError', error.response.data)
-          this.setError();
-          this.sending = false;
-        })
-
-      },
-      validateUser () {
-        this.$v.$touch()
-
-        if (!this.$v.$invalid) {
-          this.OnSubmit()
-        }
-      },
-      setError(){
-        this.errorSaved = true
-      }
-    },
-    created () {
-      this.$store.commit('changeTitle', this.title)
-      this.form.name = this.$store.getters.user 
-      this.form.email = this.$store.getters.email  
     }
+  },
+  computed: {
+    error() {
+      return this.$store.getters.erro != null
+        ? this.$store.getters.erro.message
+        : null;
+    }
+  },
+  methods: {
+    getValidationClass(fieldName) {
+      const field = this.$v.form[fieldName];
+
+      if (field) {
+        return {
+          "md-invalid": field.$invalid && field.$dirty
+        };
+      }
+    },
+    clearForm() {
+      this.$v.$reset();
+      this.form.name = null;
+      this.form.email = null;
+    },
+    OnSubmit() {
+      this.sending = true;
+      const formData = {
+        name: this.form.name,
+        newEmail: this.form.email,
+        userId: this.$store.getters.userId
+      };
+      this.$store.dispatch("alter", formData).catch(error => {
+        this.$store.dispatch("setError", error.response.data);
+        this.setError();
+        this.sending = false;
+      });
+    },
+    validateUser() {
+      this.$v.$touch();
+
+      if (!this.$v.$invalid) {
+        this.OnSubmit();
+      }
+    },
+    setError() {
+      this.errorSaved = true;
+    }
+  },
+  created() {
+    this.$store.commit("changeTitle", this.title);
+    this.form.name = this.$store.getters.user;
+    this.form.email = this.$store.getters.email;
   }
+};
 </script>
 
 <style lang="scss" scoped>
-  .md-progress-bar {
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-  }
+.md-progress-bar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+}
 
-  //Global
-  .md-card-header {
-  	background: #2687e9;
-  	color: #fff;
-  }
+//Global
+.md-card-header {
+  background: #2687e9;
+  color: #fff;
+}
 
-  .md-card-content {
-  	padding-left: 50px;
-  	padding-right: 50px;
-    padding-top: 15px;
-  }
+.md-card-content {
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-top: 15px;
+}
 
-  .md-card-actions {
-  	padding-left: 50px;
-  	padding-right: 50px;
-  }
-  //!Global
+.md-card-actions {
+  padding-left: 50px;
+  padding-right: 50px;
+}
+//!Global
 
-  .md-card-actions {
-  	padding-top: 3px;
-  	padding-bottom: 3px;
-  }
+.md-card-actions {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
 
-  .md-button.md-dense {
-  	width: 50%;
-  }
-
+.md-button.md-dense {
+  width: 50%;
+}
 </style>

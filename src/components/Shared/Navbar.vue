@@ -49,11 +49,6 @@
 </template>
 
 <script>
-  function getCompanyCode() {
-    console.log('Matheus passou aqui!');
-  //  return 'asas';
-  }
-
   export default {
     name: 'Navbar',
     data: () => ({
