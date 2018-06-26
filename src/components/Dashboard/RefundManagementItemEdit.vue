@@ -114,10 +114,10 @@ export default {
     },
     form: {
       id: null,
-      status: null,
       name: null,
       type: null,
       date: new Date(),
+      status: 2,
       value: 0,
       file: null,
       user: null,
@@ -232,17 +232,21 @@ export default {
         };
       }
     },
+    // clearForm() {
+    //   this.$v.$reset();
+    //   this.form.id = null;
+
+    //   this.form.status = null;
+    //   this.form.name = null;
+    //   this.form.type = null;
+    //   this.form.value = null;
+    //   this.form.user = null;
+    //   this.form.file = null;
+    //   this.form.company = null;
+    // },
     clearForm() {
       this.$v.$reset();
-      this.form.id = null;
-
-      this.form.status = null;
-      this.form.name = null;
-      this.form.type = null;
-      this.form.value = null;
-      this.form.user = null;
-      this.form.file = null;
-      this.form.company = null;
+      this.form = {};
     },
     saveRefund() {
       this.finalText = this.form.name;
@@ -253,38 +257,26 @@ export default {
       } else {
         this.postRefund();
       }
-      this.saveRefund = true;
-      this.sending = false;
-      this.close();
     },
     postRefund() {
-      const formData = {
-        name: this.form.name,
-        category: Number(this.form.type),
-        status: 2,
-        date: formatDate(this.form.date),
-        value: formatValue(this.form.value),
-        userName: this.email,
-        company: this.company,
-        file: this.form.file,
-        showForUser: true,
-        company: this.company
-      };
-      console.log(formData);
+      const formData = this.getData();
+
       axios
         .post("reembolso/", formData)
         .then(res => {
-          console.log(res);
+          this.sending = false;
+          this.saveRefund = true;
           this.close();
         })
         .catch(error => {
-          console.log(error);
+          console.error(error);
+          this.sending = false;
           this.finalText = error;
+          this.close();
         });
     },
-    putRefund() {
-      const formData = {
-        id: this.form.id,
+    getData() {
+      return {
         name: this.form.name,
         category: this.form.type,
         status: this.form.status,
@@ -295,15 +287,23 @@ export default {
         showForUser: true,
         company: this.company
       };
+    },
+    putRefund() {
+      let formData = this.getData();
+      formData.id = this.form.id;
+
       axios
-        .put("reembolso/edit/" + this.form.id, formData )
+        .put("reembolso/edit/" + this.form.id, formData)
         .then(res => {
-          console.log(res);
+          this.sending = false;
+          this.saveRefund = true;
           this.close();
         })
         .catch(error => {
-          console.log(error);
+          console.error(error);
+          this.sending = false;
           this.finalText = error;
+          this.close();
         });
     },
     afterSave() {
@@ -326,7 +326,7 @@ export default {
   },
   created() {
     this.saveText = "Solicitar";
-    if (this.refund != null){
+    if (this.refund != null) {
       this.form.id = this.refund.id;
       this.form.status = this.refund.status;
       this.form.name = this.refund.name;

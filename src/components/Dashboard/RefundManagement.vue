@@ -2,23 +2,17 @@
   <div>
     <div class="container md-alignment-top-center">
       <div v-if="auth">
-        <div v-if="isAdmin">
+        <div class="actions" v-if="isAdmin">
           <md-button :disabled="!(hasSelected)" @click="changeStatus('approved')" class="md-raised md-primary">Aprovar</md-button>
-          <md-button :disabled="hasAproved" @click="changeStatus('reject')" class="md-raised md-accent">Recusar</md-button>
+          <md-button :disabled="(hasAproved)" @click="changeStatus('reject')" class="md-raised md-accent">Recusar</md-button>
         </div>
-        <div v-else>
-          <md-button @click="editRefund" :disabled="hasAproved" class="md-raised md-primary">Editar</md-button>
+        <div class="actions">
+          <md-button @click="editRefund" :disabled="(hasAproved)" class="md-raised md-primary">Editar</md-button>
           <md-button @click="deleteRefunds" :disabled="!(hasSelected)" class="md-raised md-accent">Excluir</md-button>
         </div>  
       </div>
       <div>
-        <md-table 
-            md-card md-selected 
-            class="md-alignment-center reembolso-tabela"
-            v-model="searched"
-            @md-selected="onSelect"
-            :md-selected-value.sync="selected"
-            >
+        <md-table md-card class="md-alignment-center reembolso-tabela" v-model="searched" @md-selected="onSelect" :md-selected-value.sync="selected">
           <md-table-toolbar>
             <div class="md-toolbar-section-start">
               <h1 class="md-title">Reembolsos</h1>
@@ -35,45 +29,17 @@
             <md-button v-if="!isAdmin" class="md-primary md-raised" @click="showEdit = true">Novo Reembolso</md-button>
           </md-table-empty-state>
   
-          <md-table-row 
-            slot="md-table-row"
-            slot-scope="{ item }"
-            md-selectable="multiple"
-            md-auto-select
-            >
-            <md-table-cell
-              md-label="Nome"
-              md-sort-by="name"> 
-                {{item.name}} 
-            </md-table-cell>
-            <md-table-cell
-                 md-label="Status"
-                 md-sort-by="status"> 
-              <refund-status :status="item.status"></refund-status>
-            </md-table-cell>
-            <md-table-cell
-              md-label="Valor"
-              md-sort-by="value"
-              >R${{item.value}}
-            </md-table-cell>
-            <md-table-cell
-              md-label="Categoria"
-              md-sort-by="category"
-              >
-              <refund-category :category="item.category"></refund-category>
-            </md-table-cell>
-            <md-table-cell
-              md-label="Usuário"
-              md-sort-by="name"
-              v-if="isAdmin" 
-              >{{item.userName}}
-            </md-table-cell>
-          </md-table-row>
+          <md-table-row slot="md-table-row" ref="options" slot-scope="{item}" md-selectable="multiple" md-auto-select>
+          <md-table-cell md-label="Nome"  md-sort-by="name">{{item.name}}</md-table-cell>
+          <md-table-cell md-label="Status" md-sort-by="status"><refund-status :status="item.status"></refund-status></md-table-cell>
+          <md-table-cell md-label="Valor" md-sort-by="value">R${{item.value}}</md-table-cell>
+          <md-table-cell md-label="Categoria" md-sort-by="category"><refund-category :category="item.category"></refund-category></md-table-cell>
+          <md-table-cell md-label="Usuário" md-sort-by="name" v-if="isAdmin">{{item.userName}}</md-table-cell></md-table-row>
         </md-table>
       </div>
     </div>
-    <md-button v-if="!isAdmin" class="md-fab md-primary botao-reembolso" @click="insertRefund">
-      <md-icon >add</md-icon>      
+    <md-button class="md-fab md-primary botao-reembolso" @click="insertRefund">
+      <md-icon>add</md-icon>      
     </md-button>
 
     <md-dialog :md-active.sync="showEdit">
@@ -84,8 +50,8 @@
 </template>
 
 <script>
-function orderNumbers(a, b){
-  return a-b;
+function orderNumbers(a, b) {
+  return a - b;
 }
 
 const toLower = text => {
@@ -108,7 +74,6 @@ export default {
     return {
       name: "Reembolso ContaAzul",
       showEdit: false,
-      showInsert: false,
       usersId: null,
       search: null,
       searched: [],
@@ -127,10 +92,7 @@ export default {
 
       axios
         .delete("reembolso/delete", { data: formData })
-        .then(res => {
-          console.log(res);
-          this.getRefunds();
-        })
+        .then(res => this.getRefunds())
         .catch(error => console.log(error));
     },
     insertRefund() {
@@ -146,7 +108,7 @@ export default {
         .put("reembolso/changeStatus/" + refundStatus, formData)
         .then(res => {
           this.$router.push("/reembolsos");
-          this.getRefunds();
+          this.getRefundsByUser();
         })
         .catch(error => console.error(error));
     },
@@ -161,28 +123,37 @@ export default {
     getRefundsByUser() {
       axios
         .get("/reembolso/usuario/" + this.usersId + "/visible")
-        .then(res => {
-          const refunds = res.data.filter(refundData => refundData.showForUser);
-
-          this.refunds = refunds;
-          this.searched = refunds;
-          this.showEdit = false;
-        })
+        .then(res =>
+          this.attrResData(
+            res.data.filter(refundData => refundData.showForUser)
+          )
+        )
         .catch(error => console.error(error));
     },
     getRefundsByCompany() {
       axios
         .get("/reembolso/empresa/" + this.company)
-        .then(res => {
-          console.log(res.data);
-          this.refunds = [];
-          res.data.forEach(refundData => {
-            this.refunds.push(refundData);
-            this.search = null;
-            this.searched = this.refunds;
-          });
-        })
-        .catch(error => console.log(error));
+        .then(res => this.attrResData(res.data))
+        .catch(error => console.error(error));
+    },
+    resetSomeData() {
+      this.showEdit = false;
+      this.search = null;
+      this.selected = [];
+      this.refundEdit = null;
+
+      if (
+        this.$refs &&
+        this.$refs.options &&
+        this.$refs.options.$children &&
+        this.$refs.options.$children[0]
+      )
+        this.$refs.options.$children[0].isSelected = false;
+    },
+    attrResData(data) {
+      this.refunds = data;
+      this.searched = this.refunds;
+      this.resetSomeData();
     },
     getRefunds() {
       if (this.isAdmin) {
@@ -263,6 +234,10 @@ export default {
   width: 610px;
   margin: 0 auto;
   margin-top: 5%;
+}
+
+div.actions {
+  float: left;
 }
 
 .botao-reembolso {

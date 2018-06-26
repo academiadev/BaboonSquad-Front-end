@@ -11,7 +11,6 @@ import NewPassword from '@/components/password/NewPassword.vue'
 import MessageRedefine from '@/components/password/MessageRedefine.vue'
 import NotFound from '@/components/Shared/NotFound.vue'
 
-
 import store from '../store'
 
 Vue.use(Router)
