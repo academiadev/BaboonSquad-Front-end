@@ -130,7 +130,8 @@ export default new Vuex.Store({
         newPassword: data.password,
         code: data.code,
         emailUser: data.emailUser
-      }).then(res =>  router.replace('../../'))
+      }).then(res =>  
+        this.state.idToken !== null ? router.replace('../') : router.replace('../../') )
         .catch(error => console.error(error))
     },
     getUsedPassword({ commit, dispatch }, code) {
