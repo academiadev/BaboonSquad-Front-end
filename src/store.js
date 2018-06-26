@@ -28,12 +28,11 @@ export default new Vuex.Store({
       var base64Url = state.idToken.split('.')[1];
       var base64 = base64Url.replace('-', '+').replace('_', '/');
       var payload = JSON.parse(window.atob(base64));
-      console.log(payload)
       state.user = payload.user,
-        state.userId = payload.userId,
-        state.email = payload.sub,
-        state.company = payload.company,
-        state.isAdmin = payload.isAdmin
+      state.userId = payload.userId,
+      state.eqqmail = payload.sub,
+      state.company = payload.company,
+      state.isAdmin = payload.isAdmin
     },
     changeTitle(state, title) {
       state.title = title

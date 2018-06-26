@@ -3,8 +3,8 @@
     <div class="container md-alignment-top-center">
       <div v-if="auth">
         <div class="actions" v-if="isAdmin">
-          <md-button :disabled="!(hasSelected)" @click="changeStatus('approved')" class="md-raised md-primary">Aprovar</md-button>
-          <md-button :disabled="(hasAproved)" @click="changeStatus('reject')" class="md-raised md-accent">Recusar</md-button>
+          <md-button :disabled="(!hasSelected || hasAproved)" @click="changeStatus('approved')" class="md-raised md-primary">Aprovar</md-button>
+          <md-button :disabled="(hasAproved)" @click="changeStatus('rejected')" class="md-raised md-accent">Recusar</md-button>
         </div>
         <div class="actions">
           <md-button @click="editRefund" :disabled="(hasAproved)" class="md-raised md-primary">Editar</md-button>
@@ -12,7 +12,7 @@
         </div>  
       </div>
       <div>
-        <md-table md-card class="md-alignment-center reembolso-tabela" v-model="searched" @md-selected="onSelect" :md-selected-value.sync="selected">
+        <md-table md-card class="md-alignment-center reembolso-tabela" ref="form" v-model="searched" @md-selected="onSelect" :md-selected-value.sync="selected">
           <md-table-toolbar>
             <div class="md-toolbar-section-start">
               <h1 class="md-title">Reembolsos</h1>
@@ -29,7 +29,7 @@
             <md-button v-if="!isAdmin" class="md-primary md-raised" @click="showEdit = true">Novo Reembolso</md-button>
           </md-table-empty-state>
   
-          <md-table-row slot="md-table-row" ref="options" slot-scope="{item}" md-selectable="multiple" md-auto-select>
+          <md-table-row slot="md-table-row" id="option" slot-scope="{item}" md-selectable="multiple" md-auto-select>
           <md-table-cell md-label="Nome"  md-sort-by="name">{{item.name}}</md-table-cell>
           <md-table-cell md-label="Status" md-sort-by="status"><refund-status :status="item.status"></refund-status></md-table-cell>
           <md-table-cell md-label="Valor" md-sort-by="value">R${{item.value}}</md-table-cell>
@@ -93,7 +93,7 @@ export default {
       axios
         .delete("reembolso/delete", { data: formData })
         .then(res => this.getRefunds())
-        .catch(error => console.log(error));
+        .catch(error => console.error(error));
     },
     insertRefund() {
       this.refundEdit = null;
@@ -136,19 +136,21 @@ export default {
         .then(res => this.attrResData(res.data))
         .catch(error => console.error(error));
     },
+    clearOptions() {
+      const clearRecursiveComponent = item => {
+        if (item.$el.id == "option") item.isSelected = false;
+
+        for (var child of item.$children) clearRecursiveComponent(child);
+      };
+
+      clearRecursiveComponent(this.$refs["form"]);
+    },
     resetSomeData() {
       this.showEdit = false;
       this.search = null;
       this.selected = [];
       this.refundEdit = null;
-
-      if (
-        this.$refs &&
-        this.$refs.options &&
-        this.$refs.options.$children &&
-        this.$refs.options.$children[0]
-      )
-        this.$refs.options.$children[0].isSelected = false;
+      this.clearOptions();
     },
     attrResData(data) {
       this.refunds = data;

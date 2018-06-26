@@ -178,6 +178,7 @@ export default {
     },
     setFormFile(name) {
       this.form.file = name;
+      this.$refs["mdfile"].model = this.form.file;
     },
     getFileData(file) {
       const newFileName = this.getFileNameTransformed(file.name);
@@ -199,24 +200,29 @@ export default {
         .catch(error => console.error("post", error));
     },
     createImage() {
+      if (!this.form || !this.form.file) return;
+
       axios
         .get("reembolso/getImage/" + this.form.file, {
           responseType: "arraybuffer"
         })
-        .then(
-          res =>
-            (this.fileImage = `data:image/jpg;base64,${this.convertBytesToBase64(
-              res.data
-            )}`)
-        )
+        .then(res => {
+          this.fileImage = `data:image/jpg;base64,${this.convertBytesToBase64(
+            res.data
+          )}`;
+          this.$refs["mdfile"].model = this.form.file;
+        })
         .catch(error => console.error("get", error));
     },
     removeImage() {
+      if (!this.form || !this.form.file) return;
+
       axios
         .delete("reembolso/deleteImage/" + this.form.file)
         .then(res => {
           this.$refs["mdfile"].clearField();
-          this.setFormFile(null);
+          this.fileImage = null;
+          this.setFormFile("");
         })
         .catch(error => console.error("delete", error));
     },
@@ -232,18 +238,6 @@ export default {
         };
       }
     },
-    // clearForm() {
-    //   this.$v.$reset();
-    //   this.form.id = null;
-
-    //   this.form.status = null;
-    //   this.form.name = null;
-    //   this.form.type = null;
-    //   this.form.value = null;
-    //   this.form.user = null;
-    //   this.form.file = null;
-    //   this.form.company = null;
-    // },
     clearForm() {
       this.$v.$reset();
       this.form = {};
