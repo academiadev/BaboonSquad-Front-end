@@ -1,10 +1,7 @@
-﻿import Vue from 'vue'
-import Vuex from 'vuex'
-import axios from './axios-auth'
-
-import router from './router/index'
-import { resolve } from 'path';
-import { promises } from 'fs';
+﻿import Vue from 'vue';
+import Vuex from 'vuex';
+import axios from './axios-auth';
+import router from './router/index';
 
 Vue.use(Vuex)
 
@@ -30,7 +27,7 @@ export default new Vuex.Store({
       var payload = JSON.parse(window.atob(base64));
       state.user = payload.user,
       state.userId = payload.userId,
-      state.eqqmail = payload.sub,
+      state.email = payload.sub,
       state.company = payload.company,
       state.isAdmin = payload.isAdmin
     },
@@ -76,10 +73,6 @@ export default new Vuex.Store({
         typePermission: form.typePermission,
         company: form.company
       })
-        .then(res => {
-          dispatch('login', { email: form.email, password: form.password, returnSecureToken: true })
-          this.$route.replace("/reembolsos")
-        })
     },
     alter({ commit, dispatch }, form) {
       commit('clearErroData');

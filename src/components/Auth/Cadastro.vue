@@ -87,121 +87,131 @@
 </template>
 
 <script>
-  import { validationMixin } from 'vuelidate'
-  import {
-    required,
-    email,
-    minLength,
-    maxLength,
-    sameAs
-  } from 'vuelidate/lib/validators'
+import { validationMixin } from "vuelidate";
+import {
+  required,
+  email,
+  minLength,
+  maxLength,
+  sameAs
+} from "vuelidate/lib/validators";
 
-  export default {
-    name: 'Cadastro',
-    mixins: [validationMixin],
-    data: () => ({
-      form: {
+export default {
+  name: "Cadastro",
+  mixins: [validationMixin],
+  data: () => ({
+    form: {
+      name: null,
+      email: null,
+      password: null,
+      confirmPassword: null,
+      company: {
         name: null,
-        email: null,
-        password: null,
-        confirmPassword: null,
-        company: {
-          name: null,
-          code: null
-        }
-      },
-      radio: 1,
-      userSaved: false,
-      sending: false,
-      lastUser: null,
-      errorSaved: false
-    }),
-    validations: {
-      form: {
-        name: {
-          required,
-          minLength: minLength(3)
-        },
-        email: {
-          required,
-          email
-        },
-        password: {
-          required,
-          minLength: minLength(3),
-          mustHaveNumber: value =>  { var regExpNumber = RegExp("^(?=.*[0-9])");
-                                      return regExpNumber.test(value)},
-          mustHaveUpperCase: value => {var regExpUpper = RegExp("^(?=.*[A-Z])");
-                                        return regExpUpper.test(value)},
-          mustHaveSpecialCaractes: value => {var regExpSpecial = RegExp("^(?=.*[!@#$%^&*])")
-                                              return regExpSpecial.test(value)}
-        },
-        confirmPassword: {
-          required,
-          sameAs: sameAs('password')
-        },
-        company:{
-          required
-        }
+        code: null
       }
     },
-    computed: {
-      error () {
-        return this.$store.getters.erro != null ? this.$store.getters.erro.message : null ;
-      }
-    },
-    methods: {
-      getValidationClass (fieldName) {
-        const field = this.$v.form[fieldName]
-
-        if (field) {
-          return {
-            'md-invalid': field.$invalid && field.$dirty
-          }
+    radio: 1,
+    userSaved: false,
+    sending: false,
+    lastUser: null,
+    errorSaved: false
+  }),
+  validations: {
+    form: {
+      name: {
+        required,
+        minLength: minLength(3)
+      },
+      email: {
+        required,
+        email
+      },
+      password: {
+        required,
+        minLength: minLength(3),
+        mustHaveNumber: value => {
+          var regExpNumber = RegExp("^(?=.*[0-9])");
+          return regExpNumber.test(value);
+        },
+        mustHaveUpperCase: value => {
+          var regExpUpper = RegExp("^(?=.*[A-Z])");
+          return regExpUpper.test(value);
+        },
+        mustHaveSpecialCaractes: value => {
+          var regExpSpecial = RegExp("^(?=.*[!@#$%^&*])");
+          return regExpSpecial.test(value);
         }
       },
-      clearForm () {
-        this.$v.$reset()
-        this.form.name = null
-        this.form.email = null
-        this.form.password = null
-        this.form.confirmPassword = null
-        this.form.empresa = null
+      confirmPassword: {
+        required,
+        sameAs: sameAs("password")
       },
-      OnSubmit () {
-        this.sending = true
-        const formData = {
-          name: this.form.name,
-          email: this.form.email,
-          password: this.form.password,
-          company: this.form.company,
-          typePermission: this.radio
+      company: {
+        required
       }
-         this.$store.dispatch('save', formData)
-         .then(res => { 
-            this.userSaved = true
-          })
-          .catch(error => {
-            this.$store.dispatch('setError', error.response.data)
-            this.setError();
-            this.sending = false;
-          })
+    }
+  },
+  computed: {
+    error() {
+      return this.$store.getters.erro != null
+        ? this.$store.getters.erro.message
+        : null;
+    }
+  },
+  methods: {
+    getValidationClass(fieldName) {
+      const field = this.$v.form[fieldName];
 
-      },
-      validateUser () {
-        this.$v.$touch()
-
-        if (!this.$v.$invalid) {
-          this.OnSubmit()
-        } else {
-            this.sending = false
-        }
-      },
-      setError(){
-        this.errorSaved = true
+      if (field) {
+        return {
+          "md-invalid": field.$invalid && field.$dirty
+        };
       }
     },
+    clearForm() {
+      this.$v.$reset();
+      this.form.name = null;
+      this.form.email = null;
+      this.form.password = null;
+      this.form.confirmPassword = null;
+      this.form.empresa = null;
+    },
+    OnSubmit() {
+      this.sending = true;
+      const formData = {
+        name: this.form.name,
+        email: this.form.email,
+        password: this.form.password,
+        company: this.form.company,
+        typePermission: this.radio
+      };
+      this.$store
+        .dispatch("save", formData)
+        .then(res => {
+          this.userSaved = true;
+          this.$store.dispatch('login', { email: formData.email, password: formData.password, returnSecureToken: true });
+          this.$route.replace("/reembolsos");
+        })
+        .catch(error => {
+          this.$store.dispatch("setError", error.response.data);
+          this.setError();
+          this.sending = false;
+        });
+    },
+    validateUser() {
+      this.$v.$touch();
+
+      if (!this.$v.$invalid) {
+        this.OnSubmit();
+      } else {
+        this.sending = false;
+      }
+    },
+    setError() {
+      this.errorSaved = true;
+    }
   }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -217,28 +227,27 @@
 
 //Global
 .md-card-header {
-	background: #2687e9;
-	color: #fff;
+  background: #2687e9;
+  color: #fff;
 }
 
 .md-button.md-dense {
-	width: 100%;
+  width: 100%;
 }
 
 .md-card-content {
-	padding-left: 50px;
-	padding-right: 50px;
+  padding-left: 50px;
+  padding-right: 50px;
   padding-top: 15px;
 }
 
 .md-card-actions {
-	padding-left: 50px;
-	padding-right: 50px;
+  padding-left: 50px;
+  padding-right: 50px;
 }
 //!Global
 
 .md-card-actions {
-	padding-bottom: 50px;
+  padding-bottom: 50px;
 }
-
 </style>

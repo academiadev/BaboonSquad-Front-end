@@ -1,12 +1,12 @@
 <template>
   <div>
     <div class="container md-alignment-top-center">
-      <div v-if="auth">
+      <div v-if="auth" >
         <div class="actions" v-if="isAdmin">
           <md-button :disabled="(!hasSelected || hasAproved)" @click="changeStatus('approved')" class="md-raised md-primary">Aprovar</md-button>
           <md-button :disabled="(hasAproved)" @click="changeStatus('rejected')" class="md-raised md-accent">Recusar</md-button>
         </div>
-        <div class="actions">
+        <div class="actions" v-else>
           <md-button @click="editRefund" :disabled="(hasAproved)" class="md-raised md-primary">Editar</md-button>
           <md-button @click="deleteRefunds" :disabled="!(hasSelected)" class="md-raised md-accent">Excluir</md-button>
         </div>  
@@ -38,7 +38,7 @@
         </md-table>
       </div>
     </div>
-    <md-button class="md-fab md-primary botao-reembolso" @click="insertRefund">
+    <md-button v-if="!isAdmin" class="md-fab md-primary botao-reembolso" @click="insertRefund">
       <md-icon>add</md-icon>      
     </md-button>
 
@@ -113,7 +113,7 @@ export default {
         .catch(error => console.error(error));
     },
     searchOnTable() {
-      if (this.search.trim()) {
+      if (this.search && this.search.trim()) {
         this.searched = searchByName(this.refunds, this.search);
       } else {
         this.search = null;
@@ -183,6 +183,7 @@ export default {
     },
     textEmptyState() {
       if (this.search == null) {
+        if (this.isAdmin) return "Nenhuma solicitação de reeembolso";
         return "Cadastre um novo reembolso no botão abaixo.";
       }
       return (

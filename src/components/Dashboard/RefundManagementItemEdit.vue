@@ -270,13 +270,14 @@ export default {
         });
     },
     getData() {
+      console.log(this.form.user)
       return {
         name: this.form.name,
         category: this.form.type,
         status: this.form.status,
         date: formatDate(this.form.date),
         value: formatValue(this.form.value),
-        userName: this.email,
+        userName: this.$store.getters.email,
         file: this.form.file,
         showForUser: true,
         company: this.company
