@@ -1,19 +1,19 @@
 <template>
   <div>
-    <div class="container">
+    <div class="container md-alignment-top-center">
       <div v-if="auth">
         <div v-if="isAdmin">
           <md-button :disabled="!(hasSelected)" @click="changeStatus('approved')" class="md-raised md-primary">Aprovar</md-button>
           <md-button :disabled="hasAproved" @click="changeStatus('reject')" class="md-raised md-accent">Recusar</md-button>
         </div>
-        <div>
+        <div v-else>
           <md-button @click="editRefund" :disabled="hasAproved" class="md-raised md-primary">Editar</md-button>
           <md-button @click="deleteRefunds" :disabled="!(hasSelected)" class="md-raised md-accent">Excluir</md-button>
         </div>  
       </div>
       <div>
         <md-table 
-            md-card md-selected md-fixed-header 
+            md-card md-selected 
             class="md-alignment-center reembolso-tabela"
             v-model="searched"
             @md-selected="onSelect"
@@ -32,7 +32,7 @@
           <md-table-empty-state
             md-label="Nenhum reembolso cadastrado"
             :md-description="textEmptyState">
-            <md-button class="md-primary md-raised" @click="showEdit = true">Novo Reembolso</md-button>
+            <md-button v-if="!isAdmin" class="md-primary md-raised" @click="showEdit = true">Novo Reembolso</md-button>
           </md-table-empty-state>
   
           <md-table-row 
@@ -72,22 +72,22 @@
         </md-table>
       </div>
     </div>
-    <md-button v-if="isAdmin" class="md-fab md-primary botao-reembolso" @click="insertRefund">
+    <md-button v-if="!isAdmin" class="md-fab md-primary botao-reembolso" @click="insertRefund">
       <md-icon >add</md-icon>      
     </md-button>
 
     <md-dialog :md-active.sync="showEdit">
-      <refund-edit :refund="refundEdit" @CloseRefundItem="getRefundsByUser"></refund-edit>
+      <refund-edit :refund="refundEdit" @CloseRefundItem="getRefunds"></refund-edit>
     </md-dialog>
-
-  <div>
-    {{ refundEdit}}
-  </div>
 
   </div>
 </template>
 
 <script>
+function orderNumbers(a, b){
+  return a-b;
+}
+
 const toLower = text => {
   return text.toString().toLowerCase();
 };
@@ -123,31 +123,31 @@ export default {
       this.selected = items;
     },
     deleteRefunds() {
-       const formData = this.listRefundsId;
-       
+      const formData = this.listRefundsId;
+
       axios
         .delete("reembolso/delete", { data: formData })
         .then(res => {
           console.log(res);
-          this.getRefundsByUser();
+          this.getRefunds();
         })
         .catch(error => console.log(error));
     },
     insertRefund() {
-      this.refundEdit = null; 
-      this.showEdit = true; 
+      this.refundEdit = null;
+      this.showEdit = true;
     },
     editRefund() {
-      this.showEdit = true;  
+      this.showEdit = true;
     },
     changeStatus(refundStatus) {
       const formData = this.listRefundsId;
       axios
-        .put("reembolso/changeStatus/"+ refundStatus, formData)
+        .put("reembolso/changeStatus/" + refundStatus, formData)
         .then(res => {
           console.log(res);
           this.$router.push("/reembolsos");
-          this.getRefundsByUser;s
+          this.getRefunds();
         })
         .catch(error => console.log(error));
     },
@@ -161,27 +161,50 @@ export default {
     },
     getRefundsByUser() {
       axios
-        .get("/reembolso/usuario/" + this.usersId +"/visible")
+        .get("/reembolso/usuario/" + this.usersId + "/visible")
         .then(res => {
           console.log(res.data);
           this.refunds = [];
           res.data.forEach(refundData => {
-            if(refundData.showForUser=="true"){
+            if (refundData.showForUser == "true") {
               this.refunds.push(refundData);
             }
+            this.search = null;
+            this.searched = this.refunds;
           });
-          this.searched = this.refunds;
-          this.showEdit = false;
         })
         .catch(error => console.log(error));
+    },
+    getRefundsByCompany() {
+      axios
+        .get("/reembolso/empresa/" + this.company)
+        .then(res => {
+          console.log(res.data);
+          this.refunds = [];
+          res.data.forEach(refundData => {
+            this.refunds.push(refundData);
+            this.search = null;
+            this.searched = this.refunds;
+          });
+        })
+        .catch(error => console.log(error));
+    },
+    getRefunds() {
+      if (this.isAdmin) {
+        this.getRefundsByCompany();
+      } else {
+        this.getRefundsByUser();
+      }
+
+      this.showEdit = false;
     }
   },
   computed: {
     listRefundsId() {
-      const formData =[];
-       this.selected.forEach(refund => {
-         formData.push({id : refund.id })
-       })
+      const formData = [];
+      this.selected.forEach(refund => {
+        formData.push({ id: refund.id });
+      });
       return formData;
     },
     hasSelected() {
@@ -189,19 +212,19 @@ export default {
     },
     hasAproved() {
       let bool = false;
-      if(this.hasSelected){
+      if (this.hasSelected) {
         this.selected.forEach(refundSelected => {
-         if(refundSelected.status == 0){
-          bool = true;
-         } 
-        })
-      }else{
+          if (refundSelected.status == 0) {
+            bool = true;
+          }
+        });
+      } else {
         bool = true;
       }
       return bool;
     },
     textEmptyState() {
-      if (this.search==null) {
+      if (this.search == null) {
         return "Cadastre um novo reembolso no botão abaixo.";
       }
       return (
@@ -212,6 +235,9 @@ export default {
     },
     isAdmin() {
       return this.$store.getters.isAdmin;
+    },
+    company() {
+      return this.$store.getters.company;
     },
     auth() {
       return this.$store.getters.isAuthenticated;
@@ -231,8 +257,7 @@ export default {
   created() {
     this.$store.commit("changeTitle", this.name);
     this.usersId = this.$store.getters.userId;
-    this.getRefundsByUser();
-    this.searched = this.refunds;
+    this.getRefunds();
   }
 };
 </script>

@@ -54,15 +54,15 @@
 
         <md-card-actions>
           <md-button type="reset" @click="close"  :disabled="sending">FECHAR</md-button>
-          <md-button type="submit" class="md-primary" :disabled="sending">EDITAR</md-button>
+          <md-button type="submit" class="md-primary" :disabled="sending">{{saveText}}</md-button>
         </md-card-actions>
       </md-card>
 
       <md-snackbar :md-active.sync="refundSaved"> 
-        O reembolso {{ lastRefund }} foi salvo com sucesso!
+        O reembolso {{ finalText }} foi salvo com sucesso!
       </md-snackbar>
       <md-snackbar :md-active.sync="hasError"> 
-        Erro ao salvar o reembolso {{ lastRefund }}!
+        Erro ao salvar o reembolso: {{ finalText }}!
       </md-snackbar>
     </form>
 
@@ -123,10 +123,11 @@ export default {
       user: null,
       company: null
     },
+    saveText: "Editar",
+    finalText: null,
     refundSaved: false,
     sending: false,
     hasError: false,
-    lastRefund: null,
     fileName: null
   }),
   validations: {
@@ -225,6 +226,7 @@ export default {
       this.form.company = null;
     },
     saveRefund() {
+      this.finalText = this.form.name;
       this.lastRefund = this.form.name;
       this.sending = true;
       if (this.form.id) {
@@ -232,6 +234,9 @@ export default {
       } else {
         this.postRefund();
       }
+      this.saveRefund = true;
+      this.sending = false;
+      this.close();
     },
     postRefund() {
       const formData = {
@@ -251,10 +256,12 @@ export default {
         .post("reembolso/", formData)
         .then(res => {
           console.log(res);
+          this.close();
         })
-        .catch(error => console.log(error));
-        this.sending = false;
-        this.clearForm();
+        .catch(error => {
+          console.log(error);
+          this.finalText = error;
+        });
     },
     putRefund() {
       const formData = {
@@ -271,19 +278,22 @@ export default {
       };
       console.log(formData);
       axios
-        .put("reembolso/" + this.form.id, { formData })
+        .put("reembolso/edit/" + this.form.id, formData )
         .then(res => {
           console.log(res);
           this.close();
         })
-        .catch(error => console.log(error));
-      this.close();
+        .catch(error => {
+          console.log(error);
+          this.finalText = error;
+        });
     },
     afterSave() {
       this.refundSaved = true;
     },
     OnSubmit() {
       this.saveRefund();
+      this.close();
     },
     close() {
       this.$emit("CloseRefundItem");
@@ -297,6 +307,7 @@ export default {
     }
   },
   created() {
+    this.saveText = "Solicitar";
     if (this.refund != null){
       this.form.id = this.refund.id;
       this.form.status = this.refund.status;
@@ -305,6 +316,7 @@ export default {
       this.form.date = this.refund.date;
       this.form.value = this.refund.value;
       this.form.user = this.refund.user;
+      this.saveText = "Editar";
     }
   }
 };
