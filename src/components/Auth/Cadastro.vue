@@ -15,6 +15,7 @@
                 <label for="name">Nome</label>
                 <md-input name="name" id="name" v-model="form.name" @blur="$v.form.name.$touch()" :disabled="sending" />
                 <span class="md-error" v-if="!$v.form.name.required">É necessário informar um nome</span>
+                <span class="md-error" v-else-if="!$v.form.name.minlength">O nome do reembolso deve possuir mais de {{ $v.form.name.$params.minLength.min }} letras</span>
               </md-field>
             </div>
           </div>
@@ -32,7 +33,7 @@
               <label for="password">Senha</label>
               <md-input type="password" name="password" id="password" v-model="form.password" :disabled="sending" />
               <span class="md-error" v-if="!$v.form.password.required">É necesário preencher uma senha</span>
-              <span class="md-error" v-else-if="!$v.form.password.minLength">A senha deve ter no mínimo 8 caracteres</span>
+              <span class="md-error" v-else-if="!$v.form.password.minLength">A senha deve ter no mínimo {{ $v.form.password.$params.minLength.min }} caracteres</span>
               <span class="md-error" v-else-if="!$v.form.password.mustHaveNumber">A senha deve possuir no mínimo um número</span>
               <span class="md-error" v-else-if="!$v.form.password.mustHaveUpperCase">A senha deve possuir no mínimo uma letra maiúscula</span>
               <span class="md-error" v-else-if="!$v.form.password.mustHaveSpecialCaractes">A senha deve possuir no mínimo um carácter especial</span>
@@ -128,7 +129,7 @@ export default {
       },
       password: {
         required,
-        minLength: minLength(3),
+        minLength: minLength(8),
         mustHaveNumber: value => {
           var regExpNumber = RegExp("^(?=.*[0-9])");
           return regExpNumber.test(value);

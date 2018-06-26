@@ -12,14 +12,14 @@
           </div>
             <md-field :class="getValidationClass('name')">
               <label for="name">Nome do reembolso</label>
-              <md-input name="name" id="name" v-model="form.name" :disabled="sending" />
+              <md-input name="name" id="name" v-model="form.name" :disabled="sending || isAdmin" />
               <span class="md-error" v-if="!$v.form.name.required">É necesario nomear o reembolso</span>
               <span class="md-error" v-else-if="!$v.form.name.minlength">O nome do reembolso deve possuir mais de {{ $v.form.name.$params.minLength.min }} letras</span>
             </md-field>
           
-          <md-field  :class="getValidationClass('type')">
+          <md-field  :class="getValidationClass('type')" >
             <label for="type">Categoria</label>
-            <md-select v-model="form.type"  name="type" id="type">
+            <md-select v-model="form.type"  name="type" id="type" :disabled="sending || isAdmin">
               <md-option disabled value="">Escolha</md-option>
               <md-option value=0>Outros</md-option>
               <md-option value=1>Hospedagem</md-option>
@@ -28,19 +28,19 @@
             </md-select>
             <span class="md-error">O reembolso deve possuir uma categoria</span>
           </md-field>
+         
+          <md-datepicker :class="getValidationClass('date')" id="date" v-model="form.date" :md-disabled-dates="sending || isAdmin"  md-immediately/>
           
-          <md-datepicker md-immediately="true" :class="getValidationClass('date')" id="date" v-model="form.date"/>
-        
           <md-field :class="getValidationClass('value')">
             <label for="value">Valor</label>
-            <md-input type="money" id="value" name="value" v-money="money" v-model="form.value" :disabled="sending" />
+            <md-input type="money" id="value" name="value" v-money="money" v-model="form.value" :disabled="sending || isAdmin" />
             <span class="md-error" v-if="!$v.form.value.required">Informe o valor do reembolso</span>
             <span class="md-error" v-else-if="!$v.form.value.numeric">Informe um valor válido para o reembolso</span>
             <span class="md-error" v-else-if="!$v.form.value.minValue">Informe um valor maior que zero para o reembolso</span>
           </md-field>
         
           <md-field>
-            <md-file placeholder="Selecione uma imagem" ref="mdfile" @change ="onFileUpload($event)" accept="image/*" />
+            <md-file placeholder="Selecione uma imagem" ref="mdfile" @change ="onFileUpload($event)" accept="image/*" :disabled="sending || isAdmin" />
           </md-field>
           <md-card-media v-if="fileImage">
               <img src="../../assets/remove-24x24.png" @click="removeImage" title="Remover" class="img-refund-remove" />
@@ -54,7 +54,7 @@
 
         <md-card-actions>
           <md-button type="reset" @click="close"  :disabled="sending">FECHAR</md-button>
-          <md-button type="submit" class="md-primary" :disabled="sending">{{saveText}}</md-button>
+          <md-button v-if="!isAdmin" type="submit" class="md-primary" :disabled="sending">{{saveText}}</md-button>
         </md-card-actions>
       </md-card>
 
@@ -150,6 +150,9 @@ export default {
   computed: {
     company() {
       return this.$store.getters.company;
+    },
+    isAdmin() {
+      return this.$store.getters.isAdmin;
     },
     email() {
       return this.$store.getters.email;

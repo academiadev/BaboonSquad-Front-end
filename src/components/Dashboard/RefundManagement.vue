@@ -5,6 +5,7 @@
         <div class="actions" v-if="isAdmin">
           <md-button :disabled="(!hasSelected || hasAproved)" @click="changeStatus('approved')" class="md-raised md-primary">Aprovar</md-button>
           <md-button :disabled="(hasAproved)" @click="changeStatus('rejected')" class="md-raised md-accent">Recusar</md-button>
+          <md-button :disabled="!(hasSelected)" @click="editRefund" class="md-raised">Visualizar</md-button>
         </div>
         <div class="actions" v-else>
           <md-button @click="editRefund" :disabled="(hasAproved)" class="md-raised md-primary">Editar</md-button>
@@ -50,10 +51,6 @@
 </template>
 
 <script>
-function orderNumbers(a, b) {
-  return a - b;
-}
-
 const toLower = text => {
   return text.toString().toLowerCase();
 };
