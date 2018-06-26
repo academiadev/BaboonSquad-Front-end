@@ -7,7 +7,7 @@
           <div class="md-title">Cadastre uma nova senha</div>
         </md-card-header>
         <md-card-content v-if="!redefinePassword">
-          <p class="already-accessed"> Esta url já foi acessado </p>
+          <p class="already-accessed"> Não é possivel acessar está página. Token expirado. </p>
           <md-card-actions>
             <md-button to="../../login">Inicio</md-button>
           </md-card-actions>
