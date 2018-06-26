@@ -4,8 +4,7 @@
       <md-empty-state></md-empty-state>
       <md-table class="md-alignment-top-center" md-card>
         <md-table-toolbar>
-          <h1 class="md-title">Gastos por Categoria     {{company}}
-</h1>
+          <h1 class="md-title">Gastos por Categoria</h1>
         </md-table-toolbar>
         <refund-expense-graph />
       </md-table>

@@ -108,7 +108,7 @@ export default {
         .put("reembolso/changeStatus/" + refundStatus, formData)
         .then(res => {
           this.$router.push("/reembolsos");
-          this.getRefundsByUser();
+          this.getRefunds();
         })
         .catch(error => console.error(error));
     },
