@@ -1,21 +1,19 @@
 # reembolsoazul
 
-> A Vue.js project
+> Projeto do Front-End feito em Vue.js do ReembolsoAzul
 
 ## Build Setup
 
 ``` bash
-# install dependencies
+# instala todas as dependencias do projeto
 npm install
 
-# serve with hot reload at localhost:8080
+# Rola o server para desenvolvimento em localhost:8080 (ou proxima porta disponivel)
 npm run dev
 
-# build for production with minification
+# constroi o projeto para producao (minimizado)
 npm run build
 
-# build for production and view the bundle analyzer report
-npm run build --report
 ```
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+Para mais explicacoes e detalhes, veja: [guide](http://vuejs-templates.github.io/webpack/) e [docs for vue-loader](http://vuejs.github.io/vue-loader).
