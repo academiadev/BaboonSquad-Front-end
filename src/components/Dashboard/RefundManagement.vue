@@ -93,16 +93,16 @@ const toLower = text => {
 };
 
 const searchByName = (items, term) => {
-  if (term) {
-    return items.filter(item => toLower(item.name).includes(toLower(term)));
-  }
-
-  return items;
+  return !term
+    ? items
+    : items.filter(item => toLower(item.name).includes(toLower(term)));
 };
+
 import axios from "@/axios-auth";
 import Status from "./RefundStatus.vue";
 import Category from "./RefundCategory.vue";
 import RefundManagementItemEdit from "./RefundManagementItemEdit.vue";
+
 export default {
   data() {
     return {
@@ -145,11 +145,10 @@ export default {
       axios
         .put("reembolso/changeStatus/" + refundStatus, formData)
         .then(res => {
-          console.log(res);
           this.$router.push("/reembolsos");
           this.getRefunds();
         })
-        .catch(error => console.log(error));
+        .catch(error => console.error(error));
     },
     searchOnTable() {
       if (this.search.trim()) {
@@ -163,17 +162,13 @@ export default {
       axios
         .get("/reembolso/usuario/" + this.usersId + "/visible")
         .then(res => {
-          console.log(res.data);
-          this.refunds = [];
-          res.data.forEach(refundData => {
-            if (refundData.showForUser == "true") {
-              this.refunds.push(refundData);
-            }
-            this.search = null;
-            this.searched = this.refunds;
-          });
+          const refunds = res.data.filter(refundData => refundData.showForUser);
+
+          this.refunds = refunds;
+          this.searched = refunds;
+          this.showEdit = false;
         })
-        .catch(error => console.log(error));
+        .catch(error => console.error(error));
     },
     getRefundsByCompany() {
       axios
@@ -201,27 +196,17 @@ export default {
   },
   computed: {
     listRefundsId() {
-      const formData = [];
-      this.selected.forEach(refund => {
-        formData.push({ id: refund.id });
+      return this.selected.map(refund => {
+        return { id: refund.id };
       });
-      return formData;
     },
     hasSelected() {
       return this.selected[0] != null;
     },
     hasAproved() {
-      let bool = false;
-      if (this.hasSelected) {
-        this.selected.forEach(refundSelected => {
-          if (refundSelected.status == 0) {
-            bool = true;
-          }
-        });
-      } else {
-        bool = true;
-      }
-      return bool;
+      if (!this.hasSelected) return true;
+
+      return this.selected.some(refundSelected => refundSelected.status == 0);
     },
     textEmptyState() {
       if (this.search == null) {

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="app">
     <line-chart :data="refunds" legend="top" :curve="true" prefix="R$">
     </line-chart>
@@ -45,22 +45,19 @@ export default {
 
       return groups;
     },
+    getRefundData(refunds) {
+      return refunds
+        .map(this.convertDate)
+        .sort(this.orderByDate)
+        .reduce(this.groupByMonth, {});
+    },
     refundAdapter(refunds) {
-      const data = [];
-
-      for(let category in refunds){
-        let refundsGrouped = refunds[category]
-                              .map(this.convertDate)
-                              .sort(this.orderByDate)
-                              .reduce(this.groupByMonth, {});
-
-        let graphs = {};
-        graphs.name = category;
-        graphs.data = refundsGrouped;
-
-        data.push(graphs);
-      }
-      return data;
+      return Object.keys(refunds).map(key => {
+        return {
+          name: key,
+          data: this.getRefundData(refunds[key])
+        };
+      });
     }
   }
 };

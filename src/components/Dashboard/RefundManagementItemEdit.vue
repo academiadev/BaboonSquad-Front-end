@@ -40,12 +40,12 @@
           </md-field>
         
           <md-field>
-            <md-file placeholder="Selecione uma imagem" v-model="form.fileName" ref="mdfile" @change ="onFileUpload($event)" accept="image/*" />
+            <md-file placeholder="Selecione uma imagem" ref="mdfile" @change ="onFileUpload($event)" accept="image/*" />
           </md-field>
-          <md-card-media v-if="form.file">
-              <img src="../../assets/remove-24x24.png"  @click="removeImage" title="Remover" class="img-refund-remove" />
+          <md-card-media v-if="fileImage">
+              <img src="../../assets/remove-24x24.png" @click="removeImage" title="Remover" class="img-refund-remove" />
               <div class="images" v-viewer>
-                <img :src="form.file" title="Ampliar"  class="img-refund"/>
+                <img :src="fileImage" title="Ampliar" class="img-refund"/>
               </div>
           </md-card-media>
         </md-card-content>
@@ -97,7 +97,7 @@ import {
   minValue
 } from "vuelidate/lib/validators";
 
-import refundExpenseGraphVue from './refundExpenseGraph.vue';
+import refundExpenseGraphVue from "./refundExpenseGraph.vue";
 
 export default {
   props: ["refund"],
@@ -128,7 +128,7 @@ export default {
     refundSaved: false,
     sending: false,
     hasError: false,
-    fileName: null
+    fileImage: null
   }),
   validations: {
     form: {
@@ -163,43 +163,62 @@ export default {
     onFileUpload(event) {
       const files = event.target.files || event.dataTransfer.files;
       if (!files.length) return;
-      
+
       this.saveImage(files[0]);
     },
-    saveImage(file) {
-      let data = new FormData();
-      data.append("file", file);
-      this.fileName = file.name;
+    generateName(extension) {
+      return Math.random()
+        .toString(36)
+        .replace(".", "-")
+        .concat(".")
+        .concat(extension);
+    },
+    getFileNameTransformed(name) {
+      return this.generateName(name.split(".").pop());
+    },
+    setFormFile(name) {
+      this.form.file = name;
+    },
+    getFileData(file) {
+      const newFileName = this.getFileNameTransformed(file.name);
+      this.setFormFile(newFileName);
 
+      const data = new FormData();
+      data.append("file", file, newFileName);
+
+      return data;
+    },
+    saveImage(file) {
+      const data = this.getFileData(file);
       const config = {
         headers: { "content-type": "multipart/form-data" }
       };
       axios
         .post("reembolso/carregarImage", data, config)
-        .then(this.createImage())
+        .then(res => this.createImage())
         .catch(error => console.error("post", error));
     },
     createImage() {
       axios
-        .get("reembolso/getImage/" + this.fileName, {
+        .get("reembolso/getImage/" + this.form.file, {
           responseType: "arraybuffer"
         })
-        .then(res => {
-          this.form.file = `data:image/jpg;base64,${this.convertBytesToBase64(
-            res.data
-          )}`;
-        })
+        .then(
+          res =>
+            (this.fileImage = `data:image/jpg;base64,${this.convertBytesToBase64(
+              res.data
+            )}`)
+        )
         .catch(error => console.error("get", error));
     },
     removeImage() {
       axios
-        .delete("reembolso/deleteImage/" + this.fileName)
+        .delete("reembolso/deleteImage/" + this.form.file)
         .then(res => {
-            this.$refs["mdfile"].clearField();
-            this.form.file = null;
-            this.fileName = null;
+          this.$refs["mdfile"].clearField();
+          this.setFormFile(null);
         })
-        .catch(error => console.error("delete", error));  
+        .catch(error => console.error("delete", error));
     },
     convertBytesToBase64(file) {
       return new Buffer(file, "binary").toString("base64");
@@ -276,7 +295,6 @@ export default {
         showForUser: true,
         company: this.company
       };
-      console.log(formData);
       axios
         .put("reembolso/edit/" + this.form.id, formData )
         .then(res => {
@@ -316,7 +334,9 @@ export default {
       this.form.date = this.refund.date;
       this.form.value = this.refund.value;
       this.form.user = this.refund.user;
+      this.form.file = this.refund.file;
       this.saveText = "Editar";
+      this.createImage();
     }
   }
 };

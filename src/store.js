@@ -1,4 +1,4 @@
-import Vue from 'vue'
+﻿import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from './axios-auth'
 
@@ -28,6 +28,7 @@ export default new Vuex.Store({
       var base64Url = state.idToken.split('.')[1];
       var base64 = base64Url.replace('-', '+').replace('_', '/');
       var payload = JSON.parse(window.atob(base64));
+      console.log(payload)
       state.user = payload.user,
         state.userId = payload.userId,
         state.email = payload.sub,
@@ -128,31 +129,22 @@ export default new Vuex.Store({
         });
     },
     requestRedefinePassword({ commit, dispatch }, form) {
-      axios.post('/password/request', {
-        email: form.email,
-      }).then(res => {
-        router.replace('/password/message/' + form.email)
-      })
-        .catch(error => console.log(error))
+      axios.post('/password/request', { email: form.email })
+        .then(res => router.replace('/password/message/' + form.email))
+        .catch(error => console.error(error))
     },
     redefinePassword({ commit, dispatch }, data) {
       axios.post('/password/alter', {
         newPassword: data.password,
         code: data.code,
         emailUser: data.emailUser
-      }).then(res => {
-        console.log(res)
-        router.replace('../')
-
-      })
-        .catch(error => console.log(error))
+      }).then(res =>  router.replace('../../'))
+        .catch(error => console.error(error))
     },
     getUsedPassword({ commit, dispatch }, code) {
-      axios.get('/password/new/' + code).then(res => {
-        console.log(res),
-          dispatch('setRedefinePassword', res.data)
-      })
-        .catch(error => console.log(error))
+      axios.get('/password/new/' + code)
+        .then(res => dispatch('setRedefinePassword', res.data))
+        .catch(error => console.error(error))
     },
     tryAutoLogin({ commit }) {
       const token = localStorage.getItem('token')
